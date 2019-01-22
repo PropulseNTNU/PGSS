@@ -26,3 +26,5 @@ HEADERS += \
     globals.h \
     serialinterface.h
 
+win32:RC_ICNS = propulse_logo_icon.ico
+macx:ICON = proulse_logo.icns

@@ -9,5 +9,5 @@ namespace globals {
     const int CHART_WIN_MIN_WIDTH = 400;
     const int CHART_WIN_MIN_HEIGHT = 300;
 
-    const int TIMER_UPDATE = 200;
+    const int TIMER_UPDATE = 100;
 }

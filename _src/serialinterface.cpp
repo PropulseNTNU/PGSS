@@ -44,10 +44,12 @@ bool SerialInterface::setupPort(QString portName, qint32 baudRate) {
 void SerialInterface::readSerial() {
     QSerialPort* device = qobject_cast<QSerialPort*>(QObject::sender());
     QString data = device->readAll();
-    data.remove('\r');
-    data.remove('\n');
-    if (data.size())
+    buffer += data;
+    QStringList dataList = buffer.split(",");
+    if (dataList.size() > 2) {
+        data = dataList[dataList.size()-2];
         deviceValue[device->portName()] = data;
+    }
 }
 
 bool SerialInterface::setBaudRate(QString portName, qint32 baudRate) {

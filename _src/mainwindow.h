@@ -16,6 +16,8 @@ class QGroupBox;
 class QMenuBar;
 class QMenu;
 class QAction;
+class QPixmap;
+class QLabel;
 
 
 class MainWindow : public QMainWindow
@@ -57,6 +59,9 @@ private:
 
     QTimer* timer;
 
+    QPixmap* icon;
+    QWidget* iconContainer;
+    QLabel* iconLbl;
 };
 
 #endif // MAINWINDOW_H

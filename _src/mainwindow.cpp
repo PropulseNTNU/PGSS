@@ -12,6 +12,8 @@
 #include <QLineEdit>
 #include <QListWidget>
 #include <QDockWidget>
+#include <QPixmap>
+#include <QLabel>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent), currentPort("") {
@@ -35,7 +37,7 @@ void MainWindow::createAltitudeChartView() {
     // Setup chart and add to chartView
     altitudeChart = new RealTimeChart;
     altitudeChart->setXAxisTitle("Time [s]");
-    altitudeChart->setYAxisTitle("Height [m]");
+    altitudeChart->setYAxisTitle("Height [cm]");
 
     altitudeChartView = new QChartView(altitudeChart, this);
     altitudeChartView->setRenderHint(QPainter::Antialiasing);
