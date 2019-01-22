@@ -5,7 +5,7 @@
 #
 #---------------------------------------------------
 
-QT       += core gui charts serialport
+QT       += core gui charts serialport 3dcore 3drender 3dinput 3dextras
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -27,4 +27,4 @@ HEADERS += \
     serialinterface.h
 
 win32:RC_ICNS = propulse_logo_icon.ico
-macx:ICON = proulse_logo.icns
+macx:ICON = propulse_logo.icns
