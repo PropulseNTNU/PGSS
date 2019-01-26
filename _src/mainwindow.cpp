@@ -2,6 +2,7 @@
 #include "globals.h"
 #include "realtimechart.h"
 #include "serialinterface.h"
+#include "navball.h"
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -23,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Create widgets
     createAltitudeChartView();
     createDeviceSelector();
+    createNavball();
     createMenuBar();
 
     // Set altitude chart as central widget
@@ -107,6 +109,13 @@ void MainWindow::createMenuBar() {
     //});
 
     setMenuBar(menuBar);
+}
+
+void MainWindow::createNavball() {
+    QDockWidget* navballDock = new QDockWidget("Navball", this);
+    navball = new Navball(navballDock);
+    navballDock->setWidget(navball);
+    addDockWidget(Qt::RightDockWidgetArea, navballDock);
 }
 
 void MainWindow::showAvailablePorts() {
