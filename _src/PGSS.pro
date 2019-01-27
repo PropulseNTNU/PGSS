@@ -28,5 +28,8 @@ HEADERS += \
     serialinterface.h \
     navball.h
 
+RESOURCES += \
+    navball.qrc
+
 win32:RC_ICNS = propulse_logo_icon.ico
 macx:ICON = propulse_logo.icns

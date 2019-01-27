@@ -1,0 +1,6 @@
+<RCC>
+	<qresource prefix="/">
+		<file>../_resources/navball_3d_model.obj</file>
+                <file>../_resources/navball_3d_model/material01.jpg</file>
+	</qresource>
+</RCC>
