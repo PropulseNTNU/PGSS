@@ -1,11 +1,11 @@
 #---------------------------------------------------
 #
-# Project created by Ole Bjørn Eithun Pedersen, 2018
+# Project created by Amalie Wee & Ole Bjørn Eithun Pedersen, 2018
 # For Propulse NTNU
 #
 #---------------------------------------------------
 
-QT       += core gui charts serialport 3dcore 3drender 3dinput 3dextras
+QT       += core gui charts serialport 3dcore 3drender 3dinput 3dextras sensors
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -19,6 +19,8 @@ SOURCES += \
         mainwindow.cpp \
     realtimechart.cpp \
     serialinterface.cpp \
+    navballwidget.cpp \
+    renderableentity.cpp \
     navball.cpp
 
 HEADERS += \
@@ -26,6 +28,8 @@ HEADERS += \
     realtimechart.h \
     globals.h \
     serialinterface.h \
+    navballwidget.h \
+    renderableentity.h \
     navball.h
 
 RESOURCES += \

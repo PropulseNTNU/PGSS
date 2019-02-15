@@ -12,4 +12,7 @@ namespace globals {
     const int NAVBALL_HEIGHT = 200;
 
     const int TIMER_UPDATE = 100;
+
+    const int NUM_FLAGS = 10;
+    const int NUM_SENSORS = 5;
 }

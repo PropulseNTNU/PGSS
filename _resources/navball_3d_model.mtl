@@ -1,0 +1,45 @@
+#
+## Alias OBJ Material File
+# Exported from SketchUp, (c) 2000-2012 Trimble Navigation Limited
+
+newmtl material01
+Ka 0.000000 0.000000 0.000000
+Kd 0.129412 0.270588 0.219608
+Ks 0.330000 0.330000 0.330000
+d 0.900000
+map_Kd navball_3d_model/material01.jpg
+
+newmtl Translucent_Glass_Gold
+Ka 0.000000 0.000000 0.000000
+Kd 1.000000 0.996078 0.101961
+Ks 0.330000 0.330000 0.330000
+d 0.600000
+map_Kd navball_3d_model/Translucent_Glass_Gold.jpg
+
+newmtl Grade_
+Ka 0.000000 0.000000 0.000000
+Kd 0.745098 0.996078 0.101961
+Ks 0.330000 0.330000 0.330000
+d 0.600000
+map_Kd navball_3d_model/Grade_.jpg
+
+newmtl Normal
+Ka 0.000000 0.000000 0.000000
+Kd 1.000000 0.101961 1.000000
+Ks 0.330000 0.330000 0.330000
+d 0.600000
+map_Kd navball_3d_model/Normal.jpg
+
+newmtl Radial
+Ka 0.000000 0.000000 0.000000
+Kd 0.101961 1.000000 1.000000
+Ks 0.330000 0.330000 0.330000
+d 0.600000
+map_Kd navball_3d_model/Radial.jpg
+
+newmtl Translucent_Glass_Gray
+Ka 0.000000 0.000000 0.000000
+Kd 0.501961 0.501961 0.501961
+Ks 0.330000 0.330000 0.330000
+d 0.250000
+

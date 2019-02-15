@@ -7,7 +7,7 @@
 
 class RealTimeChart;
 class SerialInterface;
-class Navball;
+class NavballWidget;
 class QTimer;
 class QListWidget;
 class QLineEdit;
@@ -54,7 +54,7 @@ private:
     QMenu* deviceMenu;
 
     void createNavball();
-    Navball* navball;
+    NavballWidget* navballWidget;
 
     SerialInterface* serialInterface;
     QVector<double> midFilt;

@@ -2,7 +2,7 @@
 #include "globals.h"
 #include "realtimechart.h"
 #include "serialinterface.h"
-#include "navball.h"
+#include "navballwidget.h"
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -113,8 +113,8 @@ void MainWindow::createMenuBar() {
 
 void MainWindow::createNavball() {
     QDockWidget* navballDock = new QDockWidget("Navball", this);
-    navball = new Navball(navballDock);
-    navballDock->setWidget(navball);
+    navballWidget = new NavballWidget(navballDock);
+    navballDock->setWidget(navballWidget);
     addDockWidget(Qt::RightDockWidgetArea, navballDock);
 }
 

@@ -1,5 +1,5 @@
-#ifndef NAVBALL_H
-#define NAVBALL_H
+#ifndef NAVBALLWIDGET_H
+#define NAVBALLWIDGET_H
 
 #include <QWidget>
 #include <QtCore/QObject>
@@ -16,11 +16,11 @@
 
 // See https://doc.qt.io/qt-5/qt3d-basicshapes-cpp-example.html
 
-class Navball : public QWidget
+class NavballWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit Navball(QWidget *parent = nullptr);
+    explicit NavballWidget(QWidget *parent = nullptr);
 
 signals:
 
@@ -35,4 +35,4 @@ private:
     QWidget* windowContainer;
 };
 
-#endif // NAVBALL_H
+#endif // NAVBALLWIDGET_H

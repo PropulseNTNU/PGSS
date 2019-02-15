@@ -1,4 +1,4 @@
-#include "navball.h"
+#include "navballwidget.h"
 #include "globals.h"
 
 #include <QVBoxLayout>
@@ -31,7 +31,7 @@
 #include <Qt3DExtras/qfirstpersoncameracontroller.h>
 
 
-Navball::Navball(QWidget *parent) : QWidget(parent)
+NavballWidget::NavballWidget(QWidget *parent) : QWidget(parent)
 {
 
     Qt3DExtras::Qt3DWindow* view = new Qt3DExtras::Qt3DWindow();
@@ -77,7 +77,7 @@ Navball::Navball(QWidget *parent) : QWidget(parent)
 }
 
 
-void Navball::createNavballEntity() {
+void NavballWidget::createNavballEntity() {
       // Sphere shape data
       Qt3DExtras::QSphereMesh *sphereMesh = new Qt3DExtras::QSphereMesh();
       sphereMesh->setRings(20);
