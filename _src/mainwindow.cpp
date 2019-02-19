@@ -125,7 +125,9 @@ void MainWindow::showAvailablePorts() {
         QAction* portAction = this->deviceMenu->addAction(port);
         connect(portAction, &QAction::triggered, [this, portAction] {
             QString portName = portAction->text();
+            qDebug() << portName;
             if (this->serialInterface->setupPort(portName, 9600)) {
+                qDebug() << "Connected to port";
                 this->deviceListWidget->addItem(portName);
                 currentPort = portName;
             }
