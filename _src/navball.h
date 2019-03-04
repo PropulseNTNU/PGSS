@@ -14,8 +14,9 @@ public:
     float shininess() const;
 
 private:
-    Qt3DRender::QAbstractTexture *diffuseTexture;
-    Qt3DRender::QTextureImage *diffuseTextureImage;
+    Qt3DExtras::QNormalDiffuseSpecularMapMaterial* material;
+    Qt3DRender::QAbstractTexture* diffuseTexture;
+    Qt3DRender::QTextureImage* diffuseTextureImage;
 
 };
 

@@ -1,5 +1,6 @@
 #include "navballwidget.h"
 #include "globals.h"
+#include "navball.h"
 
 #include <QVBoxLayout>
 
@@ -35,7 +36,7 @@ NavballWidget::NavballWidget(QWidget *parent) : QWidget(parent)
 {
 
     Qt3DExtras::Qt3DWindow* view = new Qt3DExtras::Qt3DWindow();
-    view->defaultFrameGraph()->setClearColor(QColor(QRgb(0x000000)));
+    view->defaultFrameGraph()->setClearColor(QColor(QRgb(globals::NAVBALL_BACKGROUND_COLOR)));
     windowContainer = QWidget::createWindowContainer(view, this);
 
     // Root entity
@@ -65,7 +66,7 @@ NavballWidget::NavballWidget(QWidget *parent) : QWidget(parent)
     Qt3DExtras::QFirstPersonCameraController *camController = new Qt3DExtras::QFirstPersonCameraController(rootEntity);
     camController->setCamera(cameraEntity);
 
-    // Creat Navball entity
+    // Create Navball entity
     createNavballEntity();
 
     // Set root object of the scene
@@ -78,25 +79,26 @@ NavballWidget::NavballWidget(QWidget *parent) : QWidget(parent)
 
 
 void NavballWidget::createNavballEntity() {
-      // Sphere shape data
-      Qt3DExtras::QSphereMesh *sphereMesh = new Qt3DExtras::QSphereMesh();
-      sphereMesh->setRings(20);
-      sphereMesh->setSlices(20);
-      sphereMesh->setRadius(2);
+    // Sphere shape data
+    navballEntity = new Navball(rootEntity);
+    navballEntity->setEnabled(true);
+    qDebug() << "hmm..";
 
-      // Sphere mesh transform
-      Qt3DCore::QTransform *sphereTransform = new Qt3DCore::QTransform();
+    Qt3DExtras::QSphereMesh *sphereMesh = new Qt3DExtras::QSphereMesh();
+    sphereMesh->setRings(20);
+    sphereMesh->setSlices(20);
+    sphereMesh->setRadius(2);
 
-      sphereTransform->setScale(1.3f);
-      sphereTransform->setTranslation(QVector3D(-5.0f, -4.0f, 0.0f));
+    // Sphere mesh transform
+    Qt3DCore::QTransform *sphereTransform = new Qt3DCore::QTransform();
 
-      Qt3DExtras::QPhongMaterial *sphereMaterial = new Qt3DExtras::QPhongMaterial();
-      sphereMaterial->setDiffuse(QColor(QRgb(0xa69929)));
+    sphereTransform->setScale(1.3f);
+    sphereTransform->setTranslation(QVector3D(-5.0f, -4.0f, 0.0f));
 
-      // Sphere
-      sphereEntity = new Qt3DCore::QEntity(rootEntity);
-      sphereEntity->addComponent(sphereMesh);
-      sphereEntity->addComponent(sphereMaterial);
-      sphereEntity->addComponent(sphereTransform);
-      sphereEntity->setEnabled(true);
+    // Sphere
+    sphereEntity = new Qt3DCore::QEntity(rootEntity);
+    sphereEntity->addComponent(sphereMesh);
+ //   sphereEntity->addComponent(sphereMaterial);
+    sphereEntity->addComponent(sphereTransform);
+    sphereEntity->setEnabled(true);
 }

@@ -16,6 +16,8 @@
 
 // See https://doc.qt.io/qt-5/qt3d-basicshapes-cpp-example.html
 
+class Navball;
+
 class NavballWidget : public QWidget
 {
     Q_OBJECT
@@ -31,6 +33,7 @@ private:
 
     Qt3DCore::QEntity* rootEntity;
     Qt3DCore::QEntity* sphereEntity;
+    Navball* navballEntity;
     Qt3DRender::QCamera* cameraEntity;
     QWidget* windowContainer;
 };
