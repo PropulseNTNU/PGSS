@@ -19,7 +19,7 @@ class QMenu;
 class QAction;
 class QPixmap;
 class QLabel;
-
+class QQuickWidget;
 
 class MainWindow : public QMainWindow
 {
@@ -56,15 +56,15 @@ private:
     void createNavball();
     NavballWidget* navballWidget;
 
+    void createGPSMap();
+    QQuickWidget* gpsMapView;
+    QWidget* gpsMapWidget;
+
     SerialInterface* serialInterface;
     QVector<double> midFilt;
-    QString currentPort;
-
+    QString currentPort;    
     QTimer* timer;
 
-    QPixmap* icon;
-    QWidget* iconContainer;
-    QLabel* iconLbl;
 };
 
 #endif // MAINWINDOW_H

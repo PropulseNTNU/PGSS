@@ -15,6 +15,8 @@
 #include <QDockWidget>
 #include <QPixmap>
 #include <QLabel>
+#include <QQuickWidget>
+#include <QVector2D>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent), currentPort("") {
@@ -24,8 +26,9 @@ MainWindow::MainWindow(QWidget *parent) :
     // Create widgets
     createAltitudeChartView();
     createDeviceSelector();
-    createNavball();
+   // createNavball();
     createMenuBar();
+    createGPSMap();
 
     // Set altitude chart as central widget
     setCentralWidget(altitudeChartView);
@@ -118,6 +121,23 @@ void MainWindow::createNavball() {
     addDockWidget(Qt::RightDockWidgetArea, navballDock);
 }
 
+void MainWindow::createGPSMap() {
+    gpsMapWidget = new QWidget(this);
+    gpsMapView = new QQuickWidget(gpsMapWidget);
+    gpsMapView->setSource(QUrl(QStringLiteral("qrc:/gps_map.qml")));
+    QVariant returnedValue;
+    float lng = 63.408579;
+    float lat = 10.403718;
+    QVariant position = QVector2D(lng, lat);
+    QMetaObject::invokeMethod(gpsMapView, "setPosition", Q_RETURN_ARG(QVariant, returnedValue),
+                              Q_ARG(QVariant, position));
+
+    gpsMapView->show();
+    //layout->addWidget(gpsMapView);
+    //gpsMapWidget->setLayout(layout);
+    //gpsMapWidget->show();
+}
+
 void MainWindow::showAvailablePorts() {
     this->deviceMenu->clear();
     QStringList ports = this->serialInterface->getAvailableDevices();
@@ -134,3 +154,5 @@ void MainWindow::showAvailablePorts() {
         });
     }
 }
+
+
