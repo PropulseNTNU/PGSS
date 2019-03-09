@@ -1,6 +1,7 @@
 #ifndef XBEE_H
 #define XBEE_H
 #include <stdint.h>
+#include <QByteArray>
 
 enum sensorData { TIMESTAMP, BME_TEMP, IMU_TEMP, 
                   PRESSURE, ALTITUDE, 
@@ -20,8 +21,8 @@ enum sensorData { TIMESTAMP, BME_TEMP, IMU_TEMP,
  * Read last data package from buffer to flags[], sensors[] and package_number.
  * Return index of package start byte '<' in buffer
  */
-uint8_t read_buffer( uint8_t  *buffer, int buffer_size, 
-					 uint8_t  *sensors, int sensors_size,
+uint8_t read_buffer( QByteArray  &buffer, uint8_t  *sensors,
+                     int sensors_size,
 					 uint16_t *package_number);
 
 

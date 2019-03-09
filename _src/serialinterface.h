@@ -21,8 +21,12 @@ private:
     QMap<QString, QSerialPort*> devices; // Port name as key, QSerialPort object as value
     QMap<QString, QString> deviceValue; // Port name as key, current value as value
     QMap<QString, qint32> deviceBaudRate; // Port name as key, baud rate as value
-    QString buffer;
+    QByteArray buffer;
+    char* buff;
+    int buffSize;
     QString parsedData;
+    double* sensorData;
+    uint16_t packageNumber;
 
 };
 
