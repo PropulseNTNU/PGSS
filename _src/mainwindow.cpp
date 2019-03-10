@@ -2,11 +2,9 @@
 #include "globals.h"
 #include "realtimechart.h"
 #include "serialinterface.h"
-<<<<<<< HEAD
 #include "xbee.h"
-=======
 #include "navballwidget.h"
->>>>>>> 840a6ed23c66a1a77d4fd42a1b1a1980e3c28bb3
+
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
