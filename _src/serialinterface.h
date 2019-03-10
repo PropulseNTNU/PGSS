@@ -16,6 +16,7 @@ public:
     qint32 getBaudRate(QString portName);
     double getValue(QString portName);
     double* getSensorData();
+    uint16_t getPackageNumber();
 
 private:
     void readSerial(); // Called when device sends readyRead
@@ -23,8 +24,6 @@ private:
     QMap<QString, QString> deviceValue; // Port name as key, current value as value
     QMap<QString, qint32> deviceBaudRate; // Port name as key, baud rate as value
     QByteArray buffer;
-    char* buff;
-    int buffSize;
     QString parsedData;
     double* sensorData;
     uint16_t packageNumber;

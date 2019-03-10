@@ -7,9 +7,7 @@
 
 SerialInterface::SerialInterface(QObject* parent) : buffer(""), parsedData("") {
     //device = new QSerialPort;
-    buffSize = 300;
     sensorData = new double[NUM_TYPES];
-    buff = new char[buffSize] {};
     packageNumber = 0;
 }
 
@@ -35,7 +33,6 @@ bool SerialInterface::setupPort(QString portName, qint32 baudRate) {
         device = nullptr;
         return false;
     }
-    qDebug() << "Port ready!";
     connect(device, &QSerialPort::readyRead, this, &SerialInterface::readSerial);
     devices[portName] = device;
     deviceValue[portName] = "";
@@ -45,8 +42,10 @@ bool SerialInterface::setupPort(QString portName, qint32 baudRate) {
 void SerialInterface::readSerial() {
     QSerialPort* device = qobject_cast<QSerialPort*>(QObject::sender());
     QByteArray data = device->readAll();
-    read_buffer(data, (uint8_t*)sensorData, NUM_TYPES*sizeof(double),
-                       &packageNumber);
+    buffer += data;
+    if (buffer.size() > 10000)
+        buffer.clear();
+    read_buffer(buffer, (uint8_t*)sensorData, NUM_TYPES*sizeof(double), &packageNumber);
 }
 
 bool SerialInterface::setBaudRate(QString portName, qint32 baudRate) {
@@ -67,4 +66,8 @@ double SerialInterface::getValue(QString portName) {
 
 double* SerialInterface::getSensorData() {
     return sensorData;
+}
+
+uint16_t SerialInterface::getPackageNumber() {
+    return packageNumber;
 }

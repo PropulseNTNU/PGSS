@@ -30,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
     createDeviceSelector();
    // createNavball();
     createMenuBar();
-    createGPSMap();
+//    createGPSMap();
 
     // Set altitude chart as central widget
     setCentralWidget(altitudeChartView);
@@ -61,14 +61,19 @@ void MainWindow::createAltitudeChartView() {
         double height = 0;
         double latitude = 0;
         double longitude = 0;
+        double temp = 0;
+        double accX = 0;
+        uint16_t packNum = 0;
         if (currentPort.size()) {
             double* sensorData = this->serialInterface->getSensorData();
+            packNum = this->serialInterface->getPackageNumber();
             height = sensorData[ALTITUDE];
             latitude = sensorData[LATITUDE_GPS];
             longitude = sensorData[LONGITUDE_GPS];
+            temp = sensorData[BME_TEMP];
+            accX = sensorData[ACC_X];
             if (height > 0)
-                this->altitudeChart->update(height);
-
+                this->altitudeChart->update(accX);
         }
     });
 }
@@ -153,9 +158,7 @@ void MainWindow::showAvailablePorts() {
         QAction* portAction = this->deviceMenu->addAction(port);
         connect(portAction, &QAction::triggered, [this, portAction] {
             QString portName = portAction->text();
-            qDebug() << portName;
             if (this->serialInterface->setupPort(portName, 9600)) {
-                qDebug() << "Connected to port";
                 this->deviceListWidget->addItem(portName);
                 currentPort = portName;
             }
