@@ -25,6 +25,14 @@ QStringList SerialInterface::getAvailableDevices() {
 bool SerialInterface::setupPort(QString portName, qint32 baudRate) {
     QSerialPortInfo portInfo(portName);
 
+<<<<<<< HEAD
+=======
+    if (portInfo.isNull())
+        return false;
+   // if (portInfo.productIdentifier() != 67)
+   //     return false;
+
+>>>>>>> 840a6ed23c66a1a77d4fd42a1b1a1980e3c28bb3
     QSerialPort* device = new QSerialPort(portName, this);
     device->open(QSerialPort::ReadOnly);
 
@@ -46,8 +54,18 @@ bool SerialInterface::setupPort(QString portName, qint32 baudRate) {
 void SerialInterface::readSerial() {
     QSerialPort* device = qobject_cast<QSerialPort*>(QObject::sender());
     QByteArray data = device->readAll();
+<<<<<<< HEAD
     read_buffer(data, (uint8_t*)sensorData, NUM_TYPES*sizeof(double),
                        &packageNumber);
+=======
+    qDebug() << data;
+    buffer += data;
+    QStringList dataList = buffer.split(",");
+    if (dataList.size() > 2) {
+        //data = dataList[dataList.size()-2];
+        deviceValue[device->portName()] = data;
+    }
+>>>>>>> 840a6ed23c66a1a77d4fd42a1b1a1980e3c28bb3
 }
 
 bool SerialInterface::setBaudRate(QString portName, qint32 baudRate) {

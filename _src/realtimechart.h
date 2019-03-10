@@ -3,6 +3,8 @@
 
 #include <QtCharts>
 
+// See https://doc.qt.io/qt-5/qtcharts-dynamicspline-example.html
+
 QT_CHARTS_BEGIN_NAMESPACE
 class QLineSeries;
 class QValueAxis;

@@ -2,7 +2,11 @@
 #include "globals.h"
 #include "realtimechart.h"
 #include "serialinterface.h"
+<<<<<<< HEAD
 #include "xbee.h"
+=======
+#include "navballwidget.h"
+>>>>>>> 840a6ed23c66a1a77d4fd42a1b1a1980e3c28bb3
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -15,6 +19,8 @@
 #include <QDockWidget>
 #include <QPixmap>
 #include <QLabel>
+#include <QQuickWidget>
+#include <QVector2D>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent), currentPort("") {
@@ -24,7 +30,9 @@ MainWindow::MainWindow(QWidget *parent) :
     // Create widgets
     createAltitudeChartView();
     createDeviceSelector();
+   // createNavball();
     createMenuBar();
+    createGPSMap();
 
     // Set altitude chart as central widget
     setCentralWidget(altitudeChartView);
@@ -116,6 +124,30 @@ void MainWindow::createMenuBar() {
     setMenuBar(menuBar);
 }
 
+void MainWindow::createNavball() {
+    QDockWidget* navballDock = new QDockWidget("Navball", this);
+    navballWidget = new NavballWidget(navballDock);
+    navballDock->setWidget(navballWidget);
+    addDockWidget(Qt::RightDockWidgetArea, navballDock);
+}
+
+void MainWindow::createGPSMap() {
+    gpsMapWidget = new QWidget(this);
+    gpsMapView = new QQuickWidget(gpsMapWidget);
+    gpsMapView->setSource(QUrl(QStringLiteral("qrc:/gps_map.qml")));
+    QVariant returnedValue;
+    float lng = 63.408579;
+    float lat = 10.403718;
+    QVariant position = QVector2D(lng, lat);
+    QMetaObject::invokeMethod(gpsMapView, "setPosition", Q_RETURN_ARG(QVariant, returnedValue),
+                              Q_ARG(QVariant, position));
+
+    gpsMapView->show();
+    //layout->addWidget(gpsMapView);
+    //gpsMapWidget->setLayout(layout);
+    //gpsMapWidget->show();
+}
+
 void MainWindow::showAvailablePorts() {
     this->deviceMenu->clear();
     QStringList ports = this->serialInterface->getAvailableDevices();
@@ -123,10 +155,14 @@ void MainWindow::showAvailablePorts() {
         QAction* portAction = this->deviceMenu->addAction(port);
         connect(portAction, &QAction::triggered, [this, portAction] {
             QString portName = portAction->text();
+            qDebug() << portName;
             if (this->serialInterface->setupPort(portName, 9600)) {
+                qDebug() << "Connected to port";
                 this->deviceListWidget->addItem(portName);
                 currentPort = portName;
             }
         });
     }
 }
+
+
