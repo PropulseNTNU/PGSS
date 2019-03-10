@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>../_resources/rocket_marker.png</file>
+    </qresource>
+</RCC>

@@ -18,7 +18,9 @@
 #include <QPixmap>
 #include <QLabel>
 #include <QQuickWidget>
+#include <QQuickView>
 #include <QVector2D>
+#include <QQuickItem>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent), currentPort("") {
@@ -30,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent) :
     createDeviceSelector();
    // createNavball();
     createMenuBar();
-//    createGPSMap();
+    createGPSMap();
 
     // Set altitude chart as central widget
     setCentralWidget(altitudeChartView);
@@ -57,25 +59,7 @@ void MainWindow::createAltitudeChartView() {
     timer = new QTimer;
     timer->setInterval(globals::TIMER_UPDATE);
     timer->start();
-    connect(timer, &QTimer::timeout, [this] {
-        double height = 0;
-        double latitude = 0;
-        double longitude = 0;
-        double temp = 0;
-        double accX = 0;
-        uint16_t packNum = 0;
-        if (currentPort.size()) {
-            double* sensorData = this->serialInterface->getSensorData();
-            packNum = this->serialInterface->getPackageNumber();
-            height = sensorData[ALTITUDE];
-            latitude = sensorData[LATITUDE_GPS];
-            longitude = sensorData[LONGITUDE_GPS];
-            temp = sensorData[BME_TEMP];
-            accX = sensorData[ACC_X];
-            if (height > 0)
-                this->altitudeChart->update(accX);
-        }
-    });
+    connect(timer, &QTimer::timeout, this, &MainWindow::updateSensorData);
 }
 
 void MainWindow::createDeviceSelector() {
@@ -135,20 +119,16 @@ void MainWindow::createNavball() {
 }
 
 void MainWindow::createGPSMap() {
-    gpsMapWidget = new QWidget(this);
-    gpsMapView = new QQuickWidget(gpsMapWidget);
-    gpsMapView->setSource(QUrl(QStringLiteral("qrc:/gps_map.qml")));
-    QVariant returnedValue;
-    float lng = 63.408579;
-    float lat = 10.403718;
-    QVariant position = QVector2D(lng, lat);
-    QMetaObject::invokeMethod(gpsMapView, "setPosition", Q_RETURN_ARG(QVariant, returnedValue),
-                              Q_ARG(QVariant, position));
+    QDockWidget* gpsMapDock = new QDockWidget("GPS map", this);
 
+    gpsMapView = new QQuickWidget;
+    gpsMapView->setSource(QUrl(QStringLiteral("qrc:/gps_map.qml")));
     gpsMapView->show();
-    //layout->addWidget(gpsMapView);
-    //gpsMapWidget->setLayout(layout);
-    //gpsMapWidget->show();
+
+
+
+    gpsMapDock->setWidget(gpsMapView);
+    addDockWidget(Qt::RightDockWidgetArea, gpsMapDock);
 }
 
 void MainWindow::showAvailablePorts() {
@@ -167,3 +147,34 @@ void MainWindow::showAvailablePorts() {
 }
 
 
+void MainWindow::updateSensorData() {
+    double height = 0;
+    double latitude = 0;
+    double longitude = 0;
+    double temp = 0;
+    double accX = 0;
+
+    uint16_t packNum = 0;
+    if (currentPort.size()) {
+        double* sensorData = this->serialInterface->getSensorData();
+        packNum = this->serialInterface->getPackageNumber();
+        height = sensorData[ALTITUDE];
+        latitude = sensorData[LATITUDE_GPS];
+        longitude = sensorData[LONGITUDE_GPS];
+        temp = sensorData[BME_TEMP];
+        accX = sensorData[ACC_X];
+        if (height > 0)
+            this->altitudeChart->update(height);
+
+        QObject* object = (gpsMapView->rootObject())->findChild<QObject*>("gpsMapItem");
+        QVariant latitudeQV = QVariant(latitude);
+        QVariant longitudeQV = QVariant(longitude);
+
+        if (object != NULL) {
+            qDebug() << "Found object!";
+            QMetaObject::invokeMethod(object, "updatePosition",
+                                      Q_ARG(QVariant, latitudeQV),
+                                      Q_ARG(QVariant, longitudeQV));
+        }
+    }
+}

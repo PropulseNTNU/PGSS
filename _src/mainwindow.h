@@ -31,6 +31,7 @@ public:
 
 public slots:
      void showAvailablePorts();
+     void updateSensorData();
 
 private:
 
@@ -64,7 +65,6 @@ private:
     QVector<double> midFilt;
     QString currentPort;    
     QTimer* timer;
-
 };
 
 #endif // MAINWINDOW_H
