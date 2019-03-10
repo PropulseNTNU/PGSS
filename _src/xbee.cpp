@@ -13,7 +13,7 @@ uint8_t read_buffer(QByteArray &buffer,
 	do {
         if (i - package_size <= 0) { return buffer.size(); }
         data = buffer.data()[--i];
-    } while (data != '>' && buffer.data()[i-package_size-1] == '<');
+    } while (data != '>' || buffer.data()[i-package_size-1] != '<');
 
 
     i = i - package_size; //Start index

@@ -65,3 +65,7 @@ qint32 SerialInterface::getBaudRate(QString portName) {
 double SerialInterface::getValue(QString portName) {
     return deviceValue[portName].toDouble();
 }
+
+double* SerialInterface::getSensorData() {
+    return sensorData;
+}

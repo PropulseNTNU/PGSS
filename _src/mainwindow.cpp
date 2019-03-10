@@ -2,6 +2,7 @@
 #include "globals.h"
 #include "realtimechart.h"
 #include "serialinterface.h"
+#include "xbee.h"
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -51,11 +52,17 @@ void MainWindow::createAltitudeChartView() {
     timer->setInterval(globals::TIMER_UPDATE);
     timer->start();
     connect(timer, &QTimer::timeout, [this] {
-        double y = 0;
+        double height = 0;
+        double latitude = 0;
+        double longitude = 0;
         if (currentPort.size()) {
-            y = this->serialInterface->getValue(currentPort);
-            if (y > 0)
-                this->altitudeChart->update(y);
+            double* sensorData = this->serialInterface->getSensorData();
+            height = sensorData[ALTITUDE];
+            latitude = sensorData[LATITUDE_GPS];
+            longitude = sensorData[LONGITUDE_GPS];
+            if (height > 0)
+                this->altitudeChart->update(height);
+
         }
     });
 }

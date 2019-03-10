@@ -15,6 +15,7 @@ public:
     bool setBaudRate(QString portName, qint32 baudRate);
     qint32 getBaudRate(QString portName);
     double getValue(QString portName);
+    double* getSensorData();
 
 private:
     void readSerial(); // Called when device sends readyRead
