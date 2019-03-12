@@ -4,8 +4,8 @@
 #endif // GLOBALS_H
 
 namespace globals {
-    const int CHART_YRANGE = 500;
-    const int CHART_XRANGE = 30;
+    const int CHART_YRANGE = 10;
+    const int CHART_XRANGE = 10;
     const int CHART_WIN_MIN_WIDTH = 400;
     const int CHART_WIN_MIN_HEIGHT = 300;
 

@@ -70,7 +70,7 @@ void MainWindow::createDeviceSelector() {
 
     baudRateBox = new QGroupBox(this);
     baudRateLbl = new QLabel("<b>Set baud rate:</b>");
-    baudRateInput = new QLineEdit("9600", this);
+    baudRateInput = new QLineEdit("115200", this);
     setBaudRateBtn = new QPushButton("Apply");
     updateDevicesBtn = new QPushButton("Update devices");
 
@@ -138,7 +138,7 @@ void MainWindow::showAvailablePorts() {
         QAction* portAction = this->deviceMenu->addAction(port);
         connect(portAction, &QAction::triggered, [this, portAction] {
             QString portName = portAction->text();
-            if (this->serialInterface->setupPort(portName, 9600)) {
+            if (this->serialInterface->setupPort(portName, 115200)) {
                 this->deviceListWidget->addItem(portName);
                 currentPort = portName;
             }
@@ -165,13 +165,11 @@ void MainWindow::updateSensorData() {
         accX = sensorData[ACC_X];
         if (height > 0)
             this->altitudeChart->update(height);
-
         QObject* object = (gpsMapView->rootObject())->findChild<QObject*>("gpsMapItem");
         QVariant latitudeQV = QVariant(latitude);
         QVariant longitudeQV = QVariant(longitude);
 
         if (object != NULL) {
-            qDebug() << "Found object!";
             QMetaObject::invokeMethod(object, "updatePosition",
                                       Q_ARG(QVariant, latitudeQV),
                                       Q_ARG(QVariant, longitudeQV));
