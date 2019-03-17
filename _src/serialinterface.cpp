@@ -1,4 +1,5 @@
 #include "serialinterface.h"
+#include "globals.h"
 #include "xbee.h"
 #include <QSerialPort>
 #include <QSerialPortInfo>
@@ -7,19 +8,20 @@
 
 
 
-SerialInterface::SerialInterface(QObject* parent) : buffer(""), parsedData("") {
-    //device = new QSerialPort;
+SerialInterface::SerialInterface(QObject* parent) : buffer(""),
+    baudRate(globals::SERIAL_BAUD_RATE), dataFilePath(""),
+    packageNumber(0) {
     sensorData = new double[NUM_TYPES];
-    dataFile = new QFile(fileLoc+"rocket_data.txt");
-    dataFile->open(QIODevice::ReadWrite);
-    packageNumber = 0;
+    dataFile = new QFile(dataFilePath+"launch_data.txt");
+    if (!dataFile->open(QIODevice::ReadWrite))
+        qDebug() << "Could not open:";
+        // WRITE TO LOG HERE
 }
 
 SerialInterface::~SerialInterface() {
     dataFile->close();
     delete dataFile;
 }
-
 
 QStringList SerialInterface::getAvailableDevices() {
     QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
@@ -37,43 +39,32 @@ bool SerialInterface::setupPort(QString portName, qint32 baudRate) {
     // Configure (Use default values if not set)
     device->setBaudRate(baudRate);
     if (!device->setDataBits(QSerialPort::Data8)) {
-        qDebug() << "Could not set up port..";
+        // WRITE TO LOG HERE
         delete device;
         device = nullptr;
         return false;
     }
-    connect(device, &QSerialPort::readyRead, this, &SerialInterface::readSerial);
-    devices[portName] = device;
-    deviceValue[portName] = "";
+    this->serialDevice = device;
+    connect(serialDevice, &QSerialPort::readyRead, this, &SerialInterface::readSerial);
     return true;
 }
 
 void SerialInterface::readSerial() {
-    QSerialPort* device = qobject_cast<QSerialPort*>(QObject::sender());
-    QByteArray data = device->readAll();
+    QByteArray data = serialDevice->readAll();
     QTextStream stream(dataFile);
     stream << data;
     buffer += data;
-    if (buffer.size() > 10000)
+    if (buffer.size() > globals::SERIAL_BUFFER_SIZE)
         buffer.clear();
     read_buffer(buffer, (uint8_t*)sensorData, NUM_TYPES*sizeof(double), &packageNumber);
-
 }
 
-bool SerialInterface::setBaudRate(QString portName, qint32 baudRate) {
-    if (devices[portName]->setBaudRate(baudRate)) {
-        deviceBaudRate[portName] = baudRate;
-        return true;
-    }
-    return false;
+bool SerialInterface::setBaudRate(qint32 baudRate) {
+    return serialDevice->setBaudRate(baudRate);
 }
 
-qint32 SerialInterface::getBaudRate(QString portName) {
-    return deviceBaudRate[portName];
-}
-
-double SerialInterface::getValue(QString portName) {
-    return deviceValue[portName].toDouble();
+qint32 SerialInterface::getBaudRate() {
+    return baudRate;
 }
 
 double* SerialInterface::getSensorData() {
@@ -89,6 +80,10 @@ void SerialInterface::setFileName(QString filename) {
         dataFile->close();
         delete dataFile;
     }
-    dataFile = new QFile(fileLoc+filename);
+    dataFile = new QFile(dataFilePath+filename);
     dataFile->open(QIODevice::ReadWrite);
+}
+
+void SerialInterface::setFilePath(QString filePath) {
+    dataFilePath = filePath;
 }

@@ -15,25 +15,25 @@ public:
     ~SerialInterface();
     QStringList getAvailableDevices(); // List all available devices
     bool setupPort(QString portName, qint32 baudRate); // Setup port with given baud rate
-    bool setBaudRate(QString portName, qint32 baudRate);
-    qint32 getBaudRate(QString portName);
-    double getValue(QString portName);
+    bool setBaudRate(qint32 baudRate);
+    qint32 getBaudRate();
     double* getSensorData();
     void setFileName(QString filename);
+    void setFilePath(QString filePath);
     uint16_t getPackageNumber();
 
 private:
     void readSerial(); // Called when device sends readyRead
-    QMap<QString, QSerialPort*> devices; // Port name as key, QSerialPort object as value
-    QMap<QString, QString> deviceValue; // Port name as key, current value as value
+    QSerialPort* serialDevice; // Current serial port device
+    qint32 baudRate;
     QMap<QString, qint32> deviceBaudRate; // Port name as key, baud rate as value
-    QByteArray buffer;
-    QString parsedData;
-    QString fileLoc = "/Users/olebjorn/Desktop/Test_Launch_Data/";
-    double* sensorData;
-    uint16_t packageNumber;
-    QFile *dataFile;
+    QByteArray buffer; // Serial buffer
 
+    double* sensorData; // Stores data that
+    uint16_t packageNumber; // Stores current package number
+
+    QFile *dataFile; // File object for storing all incoming raw data
+    QString dataFilePath;
 };
 
 #endif // SERIALINTERFACE_H

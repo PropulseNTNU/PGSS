@@ -21,6 +21,7 @@ class QAction;
 class QPixmap;
 class QLabel;
 class QQuickWidget;
+class QListWidget;
 
 class MainWindow : public QMainWindow
 {
@@ -32,16 +33,17 @@ public:
 
 public slots:
      void showAvailablePorts();
-     void updateSensorData();
+     void updateRealTimeVisuals();
 
 private:
-    double speed;
-    QWidget* centralwid;
-    void createAltitudeChartView();
+    void createCentralWidget();
+    QWidget* centralWidget;
+
+    void createChartViews();
     RealTimeChart* altitudeChart;
-    RealTimeChart* speedChart;
+    RealTimeChart* accelerationChart;
     QtCharts::QChartView* altitudeChartView;
-    QtCharts::QChartView* speedChartView;
+    QtCharts::QChartView* accelerationChartView;
 
     void createDeviceSelector();
     QWidget* deviceSelectorWidget;
@@ -66,9 +68,7 @@ private:
     QWidget* gpsMapWidget;
 
     SerialInterface* serialInterface;
-    QVector<double> midFilt;
     QString currentPort;
-    QFile* stringDataFile;
     QTimer* timer;
 };
 

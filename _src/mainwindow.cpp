@@ -25,59 +25,61 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent), currentPort("") {
-    centralwid = new QWidget;
-    speed = 0;
-    stringDataFile = new QFile("/Users/olebjorn/Desktop/Test_Launch_Data/string_data_launch_3.txt");
-    stringDataFile->open(QIODevice::ReadWrite);
+    centralWidget = new QWidget;
+
     // Create a serial interface
     serialInterface = new SerialInterface(this);
 
     // Create widgets
-    createAltitudeChartView();
+    createChartViews();
     createDeviceSelector();
    // createNavball();
     createMenuBar();
     createGPSMap();
+    createCentralWidget();
 
-    QVBoxLayout* lay = new QVBoxLayout;
-    lay->addWidget(altitudeChartView);
-    lay->addWidget(speedChartView);
-    centralwid->setLayout(lay);
-    // Set altitude chart as central widget
-    setCentralWidget(centralwid);
+    setCentralWidget(centralWidget);
 }
 
 MainWindow::~MainWindow() {
 
 }
 
-void MainWindow::createAltitudeChartView() {
+void MainWindow::createCentralWidget() {
+    QVBoxLayout* centralLayout = new QVBoxLayout;
+    centralLayout->addWidget(altitudeChartView);
+    centralLayout->addWidget(accelerationChartView);
+    centralWidget->setLayout(centralLayout);
+}
+
+void MainWindow::createChartViews() {
     // Setup chart and add to chartView
     altitudeChart = new RealTimeChart;
-    speedChart = new RealTimeChart;
-    speedChart->setXAxisTitle("Time [s]");
-    speedChart->setYAxisTitle("Acceleration [m/s^2]");
+    accelerationChart = new RealTimeChart;
+
     altitudeChart->setXAxisTitle("Time [s]");
     altitudeChart->setYAxisTitle("Altitude [m]");
+    accelerationChart->setXAxisTitle("Time [s]");
+    accelerationChart->setYAxisTitle("Acceleration [m/s^2]");
 
-    speedChartView = new QChartView(speedChart, this);
     altitudeChartView = new QChartView(altitudeChart, this);
+    accelerationChartView = new QChartView(accelerationChart, this);
 
-    speedChartView->setRenderHint(QPainter::Antialiasing);
-    speedChartView->setMinimumSize(
-                QSize(globals::CHART_WIN_MIN_WIDTH,
-                      globals::CHART_WIN_MIN_HEIGHT));
     altitudeChartView->setRenderHint(QPainter::Antialiasing);
     altitudeChartView->setMinimumSize(
                 QSize(globals::CHART_WIN_MIN_WIDTH,
                       globals::CHART_WIN_MIN_HEIGHT));
 
+    accelerationChartView->setRenderHint(QPainter::Antialiasing);
+    accelerationChartView->setMinimumSize(
+                QSize(globals::CHART_WIN_MIN_WIDTH,
+                      globals::CHART_WIN_MIN_HEIGHT));
 
     // Setup timer for updating real time plot
     timer = new QTimer;
     timer->setInterval(globals::TIMER_UPDATE);
     timer->start();
-    connect(timer, &QTimer::timeout, this, &MainWindow::updateSensorData);
+    connect(timer, &QTimer::timeout, this, &MainWindow::updateRealTimeVisuals);
 }
 
 void MainWindow::createDeviceSelector() {
@@ -167,8 +169,7 @@ void MainWindow::showAvailablePorts() {
     }
 }
 
-
-void MainWindow::updateSensorData() {
+void MainWindow::updateRealTimeVisuals() {
     double height = 0;
     double latitude = 0;
     double longitude = 0;
@@ -189,21 +190,11 @@ void MainWindow::updateSensorData() {
         longitude = sensorData[LONGITUDE_GPS];
         temp = sensorData[BME_TEMP];
         accY -= sensorData[ACC_Y];
-        speed -= accY*0.1;
 
         if (height > 0)
             this->altitudeChart->update(height);
-        this->speedChart->update(accY);
+        this->accelerationChart->update(accY);
 
-        QTextStream textStream(stringDataFile);
-        textStream << "Time stamp: " << timeStamp << " ";
-        textStream << "Package Number: " << packNum << " ";
-        textStream << "Height: " << height << " ";
-        textStream << "GPS Alt: " << altGps<< " ";
-        textStream << "Latitude: " << latitude << " ";
-        textStream << "Longitude " << longitude << " ";
-        textStream << "BME Temp: " << temp << " ";
-        textStream << "State: " << state  << "\n";
         QObject* object = (gpsMapView->rootObject())->findChild<QObject*>("gpsMapItem");
         QVariant latitudeQV = QVariant(latitude);
         QVariant longitudeQV = QVariant(longitude);

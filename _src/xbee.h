@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <QByteArray>
 
+/* Sensor data enum has to match the one defined on the
+   flight computer. */
 enum sensorData { TIMESTAMP, BME_TEMP, IMU_TEMP,
                   PRESSURE, ALTITUDE,
                   ACC_X, ACC_Y, ACC_Z,
@@ -16,14 +18,13 @@ enum sensorData { TIMESTAMP, BME_TEMP, IMU_TEMP,
 };
 
 
-
 /*
  * Read last data package from buffer to flags[], sensors[] and package_number.
  * Return index of package start byte '<' in buffer
  */
-uint8_t read_buffer( QByteArray  &buffer, uint8_t  *sensors,
-                     int sensors_size,
-					 uint16_t *package_number);
+uint8_t read_buffer(QByteArray  &buffer, uint8_t  *sensors,
+                    int sensors_size,
+                    uint16_t *package_number);
 
 
 #endif
