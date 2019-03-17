@@ -6,7 +6,7 @@ import QtPositioning 5.6
 Item {
     visible: true
     width: 512
-    height: 512
+    height: 700
     Plugin {
         id: mapPlugin
         name: "osm" // "mapboxgl", "esri", ...

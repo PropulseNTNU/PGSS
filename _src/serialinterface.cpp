@@ -3,12 +3,21 @@
 #include <QSerialPort>
 #include <QSerialPortInfo>
 #include <QDebug>
+#include <QDateTime>
+
 
 
 SerialInterface::SerialInterface(QObject* parent) : buffer(""), parsedData("") {
     //device = new QSerialPort;
     sensorData = new double[NUM_TYPES];
+    dataFile = new QFile(fileLoc+"rocket_data.txt");
+    dataFile->open(QIODevice::ReadWrite);
     packageNumber = 0;
+}
+
+SerialInterface::~SerialInterface() {
+    dataFile->close();
+    delete dataFile;
 }
 
 
@@ -42,10 +51,13 @@ bool SerialInterface::setupPort(QString portName, qint32 baudRate) {
 void SerialInterface::readSerial() {
     QSerialPort* device = qobject_cast<QSerialPort*>(QObject::sender());
     QByteArray data = device->readAll();
+    QTextStream stream(dataFile);
+    stream << data;
     buffer += data;
     if (buffer.size() > 10000)
         buffer.clear();
     read_buffer(buffer, (uint8_t*)sensorData, NUM_TYPES*sizeof(double), &packageNumber);
+
 }
 
 bool SerialInterface::setBaudRate(QString portName, qint32 baudRate) {
@@ -70,4 +82,13 @@ double* SerialInterface::getSensorData() {
 
 uint16_t SerialInterface::getPackageNumber() {
     return packageNumber;
+}
+
+void SerialInterface::setFileName(QString filename) {
+    if (dataFile) {
+        dataFile->close();
+        delete dataFile;
+    }
+    dataFile = new QFile(fileLoc+filename);
+    dataFile->open(QIODevice::ReadWrite);
 }

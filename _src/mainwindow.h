@@ -4,6 +4,7 @@
 #include <QtCharts/QChartView>
 #include <QMainWindow>
 #include <QVector>
+#include <QFile>
 
 class RealTimeChart;
 class SerialInterface;
@@ -34,10 +35,13 @@ public slots:
      void updateSensorData();
 
 private:
-
+    double speed;
+    QWidget* centralwid;
     void createAltitudeChartView();
     RealTimeChart* altitudeChart;
+    RealTimeChart* speedChart;
     QtCharts::QChartView* altitudeChartView;
+    QtCharts::QChartView* speedChartView;
 
     void createDeviceSelector();
     QWidget* deviceSelectorWidget;
@@ -63,7 +67,8 @@ private:
 
     SerialInterface* serialInterface;
     QVector<double> midFilt;
-    QString currentPort;    
+    QString currentPort;
+    QFile* stringDataFile;
     QTimer* timer;
 };
 

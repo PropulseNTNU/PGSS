@@ -21,9 +21,14 @@
 #include <QQuickView>
 #include <QVector2D>
 #include <QQuickItem>
+#include <QTextStream>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent), currentPort("") {
+    centralwid = new QWidget;
+    speed = 0;
+    stringDataFile = new QFile("/Users/olebjorn/Desktop/Test_Launch_Data/string_data_launch_3.txt");
+    stringDataFile->open(QIODevice::ReadWrite);
     // Create a serial interface
     serialInterface = new SerialInterface(this);
 
@@ -34,8 +39,12 @@ MainWindow::MainWindow(QWidget *parent) :
     createMenuBar();
     createGPSMap();
 
+    QVBoxLayout* lay = new QVBoxLayout;
+    lay->addWidget(altitudeChartView);
+    lay->addWidget(speedChartView);
+    centralwid->setLayout(lay);
     // Set altitude chart as central widget
-    setCentralWidget(altitudeChartView);
+    setCentralWidget(centralwid);
 }
 
 MainWindow::~MainWindow() {
@@ -45,10 +54,19 @@ MainWindow::~MainWindow() {
 void MainWindow::createAltitudeChartView() {
     // Setup chart and add to chartView
     altitudeChart = new RealTimeChart;
+    speedChart = new RealTimeChart;
+    speedChart->setXAxisTitle("Time [s]");
+    speedChart->setYAxisTitle("Acceleration [m/s^2]");
     altitudeChart->setXAxisTitle("Time [s]");
-    altitudeChart->setYAxisTitle("Height [cm]");
+    altitudeChart->setYAxisTitle("Altitude [m]");
 
+    speedChartView = new QChartView(speedChart, this);
     altitudeChartView = new QChartView(altitudeChart, this);
+
+    speedChartView->setRenderHint(QPainter::Antialiasing);
+    speedChartView->setMinimumSize(
+                QSize(globals::CHART_WIN_MIN_WIDTH,
+                      globals::CHART_WIN_MIN_HEIGHT));
     altitudeChartView->setRenderHint(QPainter::Antialiasing);
     altitudeChartView->setMinimumSize(
                 QSize(globals::CHART_WIN_MIN_WIDTH,
@@ -69,11 +87,14 @@ void MainWindow::createDeviceSelector() {
     deviceListWidget = new QListWidget(this);
 
     baudRateBox = new QGroupBox(this);
-    baudRateLbl = new QLabel("<b>Set baud rate:</b>");
-    baudRateInput = new QLineEdit("115200", this);
+    baudRateLbl = new QLabel("<b>Set filename:</b>");
+    baudRateInput = new QLineEdit("rocket_data.txt", this);
     setBaudRateBtn = new QPushButton("Apply");
     updateDevicesBtn = new QPushButton("Update devices");
 
+    connect(setBaudRateBtn, &QPushButton::clicked, [this] {
+           this->serialInterface->setFileName(baudRateInput->text());
+    });
     connect(updateDevicesBtn, &QPushButton::clicked, [this] {
         this->deviceListWidget->clear();
         this->deviceListWidget->addItems(
@@ -152,23 +173,40 @@ void MainWindow::updateSensorData() {
     double latitude = 0;
     double longitude = 0;
     double temp = 0;
-    double accX = 0;
-
+    double accY = 0;
+    double timeStamp = 0;
+    double altGps = 0;
+    double state = 0;
     uint16_t packNum = 0;
     if (currentPort.size()) {
         double* sensorData = this->serialInterface->getSensorData();
+        timeStamp = sensorData[TIMESTAMP];
         packNum = this->serialInterface->getPackageNumber();
         height = sensorData[ALTITUDE];
+        altGps = sensorData[ALTITUDE_GPS];
+        state = sensorData[STATE];
         latitude = sensorData[LATITUDE_GPS];
         longitude = sensorData[LONGITUDE_GPS];
         temp = sensorData[BME_TEMP];
-        accX = sensorData[ACC_X];
+        accY -= sensorData[ACC_Y];
+        speed -= accY*0.1;
+
         if (height > 0)
             this->altitudeChart->update(height);
+        this->speedChart->update(accY);
+
+        QTextStream textStream(stringDataFile);
+        textStream << "Time stamp: " << timeStamp << " ";
+        textStream << "Package Number: " << packNum << " ";
+        textStream << "Height: " << height << " ";
+        textStream << "GPS Alt: " << altGps<< " ";
+        textStream << "Latitude: " << latitude << " ";
+        textStream << "Longitude " << longitude << " ";
+        textStream << "BME Temp: " << temp << " ";
+        textStream << "State: " << state  << "\n";
         QObject* object = (gpsMapView->rootObject())->findChild<QObject*>("gpsMapItem");
         QVariant latitudeQV = QVariant(latitude);
         QVariant longitudeQV = QVariant(longitude);
-
         if (object != NULL) {
             QMetaObject::invokeMethod(object, "updatePosition",
                                       Q_ARG(QVariant, latitudeQV),
