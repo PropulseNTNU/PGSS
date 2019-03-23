@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>../_resources/rocket_marker.png</file>
+        <file>propulse_logo.png</file>
     </qresource>
 </RCC>

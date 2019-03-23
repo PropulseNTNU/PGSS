@@ -6,9 +6,11 @@
 #include <QVector>
 #include <QFile>
 
+class ControlWidget;
 class RealTimeChart;
 class SerialInterface;
 class NavballWidget;
+class LightWidget;
 class QTimer;
 class QListWidget;
 class QLineEdit;
@@ -39,21 +41,24 @@ private:
     void createCentralWidget();
     QWidget* centralWidget;
 
+    void createStatusBar();
+    QLabel* logoLbl;
+    QPixmap* logoPixmap;
+    QWidget* statusMidContainer;
+    QLabel* missionTimeLbl;
+    QLabel* timeExpLbl;
+    QWidget* statusRightContainer;
+    LightWidget* armedStateLight;
+    LightWidget* burnoutStateLight;
+    LightWidget* airbrakesStateLight;
+    LightWidget* apogeeStateLight;
+    LightWidget* landingStateLight;
+
     void createChartViews();
     RealTimeChart* altitudeChart;
     RealTimeChart* accelerationChart;
     QtCharts::QChartView* altitudeChartView;
     QtCharts::QChartView* accelerationChartView;
-
-    void createDeviceSelector();
-    QWidget* deviceSelectorWidget;
-    QListWidget* deviceListWidget;
-
-    QGroupBox* baudRateBox;
-    QLineEdit* baudRateInput;
-    QLabel* baudRateLbl;
-    QPushButton* setBaudRateBtn;
-    QPushButton* updateDevicesBtn;
 
     void createMenuBar();
     QMenuBar* menuBar;
@@ -67,9 +72,12 @@ private:
     QQuickWidget* gpsMapView;
     QWidget* gpsMapWidget;
 
+    ControlWidget* controlWidget;
+
     SerialInterface* serialInterface;
     QString currentPort;
     QTimer* timer;
+    ControlWidget* test;
 };
 
 #endif // MAINWINDOW_H

@@ -23,7 +23,8 @@ SOURCES += \
     xbee.cpp \
     navballwidget.cpp \
     renderableentity.cpp \
-    navball.cpp
+    navball.cpp \
+    controlwidget.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -33,7 +34,9 @@ HEADERS += \
     xbee.h \
     navballwidget.h \
     renderableentity.h \
-    navball.h
+    navball.h \
+    controlwidget.h \
+    lightwidget.h
 
 RESOURCES += \
     navball.qrc \

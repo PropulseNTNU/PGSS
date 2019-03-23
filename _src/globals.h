@@ -3,6 +3,8 @@
 
 #endif // GLOBALS_H
 
+class QString;
+
 namespace globals {
     const int CHART_YRANGE = 500;
     const int CHART_XRANGE = 10;
@@ -20,4 +22,7 @@ namespace globals {
 
     const int SERIAL_BUFFER_SIZE = 1000;
     const int SERIAL_BAUD_RATE = 115200;
+
+    const QString DEFAULT_DATA_PATH = "/";
+    const QString DEFAULT_DATA_FILENAME = "launch_data.txt";
 }

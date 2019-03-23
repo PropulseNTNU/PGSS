@@ -4,6 +4,8 @@
 #include "serialinterface.h"
 #include "xbee.h"
 #include "navballwidget.h"
+#include "controlwidget.h"
+#include "lightwidget.h"
 
 #include <QTimer>
 #include <QVBoxLayout>
@@ -22,34 +24,60 @@
 #include <QVector2D>
 #include <QQuickItem>
 #include <QTextStream>
+#include <QGridLayout>
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent), currentPort("") {
-    centralWidget = new QWidget;
-
+    QMainWindow(parent), currentPort("")
+{
     // Create a serial interface
     serialInterface = new SerialInterface(this);
 
     // Create widgets
+    controlWidget = new ControlWidget(this);
     createChartViews();
-    createDeviceSelector();
-   // createNavball();
     createMenuBar();
     createGPSMap();
     createCentralWidget();
+    createStatusBar();
 
     setCentralWidget(centralWidget);
 }
 
-MainWindow::~MainWindow() {
+MainWindow::~MainWindow()
+{
 
 }
 
-void MainWindow::createCentralWidget() {
-    QVBoxLayout* centralLayout = new QVBoxLayout;
+void MainWindow::createCentralWidget()
+{
+    centralWidget = new QWidget;
+    QGridLayout* centralLayout = new QGridLayout;
     centralLayout->addWidget(altitudeChartView);
     centralLayout->addWidget(accelerationChartView);
     centralWidget->setLayout(centralLayout);
+}
+
+void MainWindow::createStatusBar()
+{
+    logoLbl = new QLabel;
+    logoPixmap = new QPixmap(":/propulse_logo.png");
+
+    logoLbl->setPixmap(*logoPixmap);
+    logoLbl->setScaledContents(true);
+    //QPixmap pixmap("qrc:/propulse_logo.png");
+    //logoLbl->setPixmap(pixmap);
+    //logoLbl->setMask(pixmap.mask());
+    logoLbl->show();
+    /*
+    QWidget* statusMidContainer;
+    QLabel* missionTimeLbl;
+    QLabel* timeExpLbl;
+    QWidget* statusRightContainer;
+    LightWidget* armedStateLight;
+    LightWidget* burnoutStateLight;
+    LightWidget* airbrakesStateLight;
+    LightWidget* apogeeStateLight;
+    LightWidget* landingStateLight; */
 }
 
 void MainWindow::createChartViews() {
@@ -82,54 +110,12 @@ void MainWindow::createChartViews() {
     connect(timer, &QTimer::timeout, this, &MainWindow::updateRealTimeVisuals);
 }
 
-void MainWindow::createDeviceSelector() {
-    QDockWidget* deviceSelectorDock = new QDockWidget("Devices", this);
-
-    deviceSelectorWidget = new QWidget;
-    deviceListWidget = new QListWidget(this);
-
-    baudRateBox = new QGroupBox(this);
-    baudRateLbl = new QLabel("<b>Set filename:</b>");
-    baudRateInput = new QLineEdit("rocket_data.txt", this);
-    setBaudRateBtn = new QPushButton("Apply");
-    updateDevicesBtn = new QPushButton("Update devices");
-
-    connect(setBaudRateBtn, &QPushButton::clicked, [this] {
-           this->serialInterface->setFileName(baudRateInput->text());
-    });
-    connect(updateDevicesBtn, &QPushButton::clicked, [this] {
-        this->deviceListWidget->clear();
-        this->deviceListWidget->addItems(
-                    this->serialInterface->getAvailableDevices());
-    });
-    QVBoxLayout* bottomPanelLayout = new QVBoxLayout;
-    QHBoxLayout* inputLayout = new QHBoxLayout;
-    inputLayout->addWidget(baudRateInput);
-    inputLayout->addWidget(setBaudRateBtn);
-    bottomPanelLayout->addWidget(baudRateLbl);
-    bottomPanelLayout->addLayout(inputLayout);
-    bottomPanelLayout->addWidget(updateDevicesBtn);
-    bottomPanelLayout->setSpacing(0);
-    baudRateBox->setLayout(bottomPanelLayout);
-
-    QVBoxLayout* deviceSelectorLayout = new QVBoxLayout;
-    deviceSelectorLayout->addWidget(deviceListWidget);
-    deviceSelectorLayout->addWidget(baudRateBox);
-    deviceSelectorWidget->setLayout(deviceSelectorLayout);
-
-    deviceSelectorDock->setWidget(deviceSelectorWidget);
-    addDockWidget(Qt::LeftDockWidgetArea, deviceSelectorDock);
-}
-
 void MainWindow::createMenuBar() {
     menuBar = new QMenuBar(this);
 
     addMenu = menuBar->addMenu(tr("&Add"));
     deviceMenu = addMenu->addMenu(tr("Device"));
     connect(deviceMenu, &QMenu::aboutToShow, this, &MainWindow::showAvailablePorts);
-    //connect(deviceMenu, &QMenu::aboutToHide, [this] {
-     //  this->deviceMenu->clear();
-    //});
 
     setMenuBar(menuBar);
 }
@@ -148,8 +134,6 @@ void MainWindow::createGPSMap() {
     gpsMapView->setSource(QUrl(QStringLiteral("qrc:/gps_map.qml")));
     gpsMapView->show();
 
-
-
     gpsMapDock->setWidget(gpsMapView);
     addDockWidget(Qt::RightDockWidgetArea, gpsMapDock);
 }
@@ -157,16 +141,8 @@ void MainWindow::createGPSMap() {
 void MainWindow::showAvailablePorts() {
     this->deviceMenu->clear();
     QStringList ports = this->serialInterface->getAvailableDevices();
-    for (auto& port : ports) {
+    for (auto& port : ports)
         QAction* portAction = this->deviceMenu->addAction(port);
-        connect(portAction, &QAction::triggered, [this, portAction] {
-            QString portName = portAction->text();
-            if (this->serialInterface->setupPort(portName, 115200)) {
-                this->deviceListWidget->addItem(portName);
-                currentPort = portName;
-            }
-        });
-    }
 }
 
 void MainWindow::updateRealTimeVisuals() {
