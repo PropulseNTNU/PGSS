@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>gps_map.qml</file>
+    </qresource>
+</RCC>

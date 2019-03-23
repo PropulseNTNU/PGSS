@@ -4,9 +4,11 @@
 #include <QtCharts/QChartView>
 #include <QMainWindow>
 #include <QVector>
+#include <QFile>
 
 class RealTimeChart;
 class SerialInterface;
+class NavballWidget;
 class QTimer;
 class QListWidget;
 class QLineEdit;
@@ -18,7 +20,8 @@ class QMenu;
 class QAction;
 class QPixmap;
 class QLabel;
-
+class QQuickWidget;
+class QListWidget;
 
 class MainWindow : public QMainWindow
 {
@@ -30,12 +33,17 @@ public:
 
 public slots:
      void showAvailablePorts();
+     void updateRealTimeVisuals();
 
 private:
+    void createCentralWidget();
+    QWidget* centralWidget;
 
-    void createAltitudeChartView();
+    void createChartViews();
     RealTimeChart* altitudeChart;
+    RealTimeChart* accelerationChart;
     QtCharts::QChartView* altitudeChartView;
+    QtCharts::QChartView* accelerationChartView;
 
     void createDeviceSelector();
     QWidget* deviceSelectorWidget;
@@ -52,16 +60,16 @@ private:
     QMenu* addMenu;
     QMenu* deviceMenu;
 
+    void createNavball();
+    NavballWidget* navballWidget;
+
+    void createGPSMap();
+    QQuickWidget* gpsMapView;
+    QWidget* gpsMapWidget;
 
     SerialInterface* serialInterface;
-    QVector<double> midFilt;
     QString currentPort;
-
     QTimer* timer;
-
-    QPixmap* icon;
-    QWidget* iconContainer;
-    QLabel* iconLbl;
 };
 
 #endif // MAINWINDOW_H

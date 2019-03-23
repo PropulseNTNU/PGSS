@@ -1,13 +1,14 @@
 #---------------------------------------------------
 #
-# Project created by Ole Bjørn Eithun Pedersen, 2018
-# For Propulse NTNU
+#       Propulse Ground Station Software
+#
+# by Amalie Wee & Ole Bjørn Eithun Pedersen, 2018
 #
 #---------------------------------------------------
 
-QT       += core gui charts serialport 3dcore 3drender 3dinput 3dextras
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT       += widgets core gui charts serialport \
+            3dcore 3drender 3dinput 3dextras \
+            quickwidgets location
 
 TARGET = PGSS
 TEMPLATE = app
@@ -18,13 +19,27 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     realtimechart.cpp \
-    serialinterface.cpp
+    serialinterface.cpp \
+    xbee.cpp \
+    navballwidget.cpp \
+    renderableentity.cpp \
+    navball.cpp
 
 HEADERS += \
         mainwindow.h \
     realtimechart.h \
     globals.h \
-    serialinterface.h
+    serialinterface.h \
+    xbee.h \
+    navballwidget.h \
+    renderableentity.h \
+    navball.h
+
+RESOURCES += \
+    navball.qrc \
+    qml.qrc \
+    img.qrc
+
 
 win32:RC_ICNS = propulse_logo_icon.ico
 macx:ICON = propulse_logo.icns
