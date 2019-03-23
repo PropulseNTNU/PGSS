@@ -33,13 +33,13 @@ MainWindow::MainWindow(QWidget *parent) :
     serialInterface = new SerialInterface(this);
 
     // Create widgets
-    controlWidget = new ControlWidget(this);
     createChartViews();
     createMenuBar();
     createGPSMap();
-    createCentralWidget();
     createStatusBar();
+    createCentralWidget();
 
+    // Set central widget
     setCentralWidget(centralWidget);
 }
 
@@ -51,6 +51,8 @@ MainWindow::~MainWindow()
 void MainWindow::createCentralWidget()
 {
     centralWidget = new QWidget;
+    controlWidget = new ControlWidget(this);
+
     QGridLayout* centralLayout = new QGridLayout;
     centralLayout->addWidget(altitudeChartView);
     centralLayout->addWidget(accelerationChartView);
@@ -59,25 +61,55 @@ void MainWindow::createCentralWidget()
 
 void MainWindow::createStatusBar()
 {
+    statusBarContainer = new QWidget;
+
     logoLbl = new QLabel;
     logoPixmap = new QPixmap(":/propulse_logo.png");
-
     logoLbl->setPixmap(*logoPixmap);
     logoLbl->setScaledContents(true);
-    //QPixmap pixmap("qrc:/propulse_logo.png");
-    //logoLbl->setPixmap(pixmap);
-    //logoLbl->setMask(pixmap.mask());
-    logoLbl->show();
-    /*
-    QWidget* statusMidContainer;
-    QLabel* missionTimeLbl;
-    QLabel* timeExpLbl;
-    QWidget* statusRightContainer;
-    LightWidget* armedStateLight;
-    LightWidget* burnoutStateLight;
-    LightWidget* airbrakesStateLight;
-    LightWidget* apogeeStateLight;
-    LightWidget* landingStateLight; */
+    logoLbl->setMaximumSize(QSize(150, 75));
+
+    statusMidContainer = new QWidget;
+    missionTimeLbl = new QLabel("Mission Time:");
+    timeLbl = new QLabel("00:00:00:00");
+    timeExpLbl = new QLabel("HH:MM:SS:MS");
+    QVBoxLayout* statusMidLayout = new QVBoxLayout;
+    statusMidLayout->addWidget(missionTimeLbl, Qt::AlignLeft);
+    statusMidLayout->addWidget(timeLbl, Qt::AlignLeft);
+    statusMidLayout->addWidget(timeExpLbl, Qt::AlignLeft);
+    statusMidContainer->setLayout(statusMidLayout);
+
+    statusRightContainer = new QWidget;
+    armedStateLbl = new QLabel("ARMED");
+    burnoutStateLbl = new QLabel("BURNOUT");
+    airbrakesStateLbl = new QLabel("BRAKES");
+    apogeeStateLbl = new QLabel("APOGEE");
+    landingStateLbl = new QLabel("LANDING");
+    armedStateLight = new LightWidget(QColor(Qt::green));
+    burnoutStateLight = new LightWidget(QColor(Qt::green));
+    airbrakesStateLight = new LightWidget(QColor(Qt::green));
+    apogeeStateLight = new LightWidget(QColor(Qt::green));
+    landingStateLight = new LightWidget(QColor(Qt::green));
+    QGridLayout* statusRightLayout = new QGridLayout;
+    statusRightLayout->addWidget(armedStateLight, 0, 0, Qt::AlignCenter);
+    statusRightLayout->addWidget(burnoutStateLight, 0, 1, Qt::AlignCenter);
+    statusRightLayout->addWidget(airbrakesStateLight, 0, 2, Qt::AlignCenter);
+    statusRightLayout->addWidget(apogeeStateLight, 0, 3, Qt::AlignCenter);
+    statusRightLayout->addWidget(landingStateLight, 0, 4, Qt::AlignCenter);
+    statusRightLayout->addWidget(armedStateLbl, 1, 0, Qt::AlignCenter);
+    statusRightLayout->addWidget(burnoutStateLbl, 1, 1, Qt::AlignCenter);
+    statusRightLayout->addWidget(airbrakesStateLbl, 1, 2, Qt::AlignCenter);
+    statusRightLayout->addWidget(apogeeStateLbl, 1, 3, Qt::AlignCenter);
+    statusRightLayout->addWidget(landingStateLbl, 1, 4, Qt::AlignCenter);
+    statusRightContainer->setLayout(statusRightLayout);
+
+    armedStateLight->turnOn();
+    burnoutStateLight->turnOn();
+    QHBoxLayout* statusBarLayout = new QHBoxLayout;
+    statusBarLayout->addWidget(logoLbl);
+    statusBarLayout->addWidget(statusMidContainer);
+    statusBarLayout->addWidget(statusRightContainer);
+    statusBarContainer->setLayout(statusBarLayout);
 }
 
 void MainWindow::createChartViews() {

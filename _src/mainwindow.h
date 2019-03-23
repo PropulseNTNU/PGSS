@@ -42,12 +42,19 @@ private:
     QWidget* centralWidget;
 
     void createStatusBar();
+    QWidget* statusBarContainer;
     QLabel* logoLbl;
     QPixmap* logoPixmap;
     QWidget* statusMidContainer;
     QLabel* missionTimeLbl;
+    QLabel* timeLbl;
     QLabel* timeExpLbl;
     QWidget* statusRightContainer;
+    QLabel* armedStateLbl;
+    QLabel* burnoutStateLbl;
+    QLabel* airbrakesStateLbl;
+    QLabel* apogeeStateLbl;
+    QLabel* landingStateLbl;
     LightWidget* armedStateLight;
     LightWidget* burnoutStateLight;
     LightWidget* airbrakesStateLight;

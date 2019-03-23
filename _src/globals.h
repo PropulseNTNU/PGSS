@@ -1,9 +1,7 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#endif // GLOBALS_H
-
-class QString;
+#include <QString>
 
 namespace globals {
     const int CHART_YRANGE = 500;
@@ -23,6 +21,10 @@ namespace globals {
     const int SERIAL_BUFFER_SIZE = 1000;
     const int SERIAL_BAUD_RATE = 115200;
 
+    const int LIGHTWIDGET_MIN_SIZE = 20;
+
     const QString DEFAULT_DATA_PATH = "/";
     const QString DEFAULT_DATA_FILENAME = "launch_data.txt";
 }
+
+#endif // GLOBALS_H
