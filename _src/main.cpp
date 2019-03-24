@@ -8,6 +8,7 @@ int main(int argc, char *argv[])
     a.setApplicationName("PGSS");
     a.setOrganizationName("Propulse NTNU");
     a.setOrganizationDomain("www.propulsentnu.no");
+    a.setStyleSheet(":/propulse_styling.qss");
 
     // Add styling
     QFile styleSheetFile(":/propulse_styling.qss");
