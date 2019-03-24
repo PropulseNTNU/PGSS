@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>propulse_styling.qss</file>
+    </qresource>
+</RCC>

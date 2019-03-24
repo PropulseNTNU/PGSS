@@ -41,7 +41,8 @@ HEADERS += \
 RESOURCES += \
     navball.qrc \
     qml.qrc \
-    img.qrc
+    img.qrc \
+    styling.qrc
 
 
 win32:RC_ICNS = propulse_logo_icon.ico

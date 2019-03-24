@@ -43,12 +43,15 @@ private:
 
     void createStatusBar();
     QWidget* statusBarContainer;
+
     QLabel* logoLbl;
     QPixmap* logoPixmap;
+
     QWidget* statusMidContainer;
     QLabel* missionTimeLbl;
     QLabel* timeLbl;
     QLabel* timeExpLbl;
+
     QWidget* statusRightContainer;
     QLabel* armedStateLbl;
     QLabel* burnoutStateLbl;
@@ -60,6 +63,39 @@ private:
     LightWidget* airbrakesStateLight;
     LightWidget* apogeeStateLight;
     LightWidget* landingStateLight;
+
+    void createDataSection();
+    QWidget* dataSectioWidget;
+
+    QWidget* topDataContainer;
+    QLabel* topLabel;
+    QLabel* altitudeLeftLbL;
+    QLabel* altitudeRightLbl;
+    QLabel* maxAltitudeLeftLbL;
+    QLabel* maxAltiudeRightLbl;
+    QLabel* velocityLeftLbL;
+    QLabel* velocityRightLbl;
+    QLabel* maxVelocityLeftLbL;
+    QLabel* maxVelocityRightLbl;
+    QLabel* accelerationLeftLbL;
+    QLabel* accelerationRightLbl;
+    QLabel* gpsLeftLbl;
+    QLabel* gpsMidLbl;
+    QLabel* gpsRightLbl;
+
+    QWidget* bottomDataContainer;
+    QLabel* pitchLeftLbl;
+    QLabel* pitchRightLbl;
+    QLabel* rollLeftLbl;
+    QLabel* rollRightLbl;
+    QLabel* yawLeftLbl;
+    QLabel* yawRightLbl;
+    QLabel* pitchRateLeftLbl;
+    QLabel* pitchRateRightLbl;
+    QLabel* rollRateLeftLbl;
+    QLabel* rollRateRightLbl;
+    QLabel* yawRateLeftLbl;
+    QLabel* yawRateRightLbl;
 
     void createChartViews();
     RealTimeChart* altitudeChart;
