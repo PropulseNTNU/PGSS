@@ -62,7 +62,7 @@ void MainWindow::createCentralWidget()
     // QWidget * widget, int fromRow, int fromColumn, int rowSpan, int columnSpan, Qt::Alignment alignment
     centralLayout->addWidget(statusBarContainer, 0, 0, 1, 10,  Qt::AlignLeft);
     centralLayout->addWidget(dataSectionContainer, 1, 0, 3, 4,  Qt::AlignLeft);
-    centralLayout->addWidget(chartContainer, 1, 4, 3, 6, Qt::AlignCenter);
+    centralLayout->addWidget(chartContainer, 1, 4, 3, 6, Qt::AlignTop);
     centralLayout->addWidget(controlWidget, 4, 0, 2, 10, Qt::AlignBaseline);
     /*
     centralLayout->addWidget(statusBarContainer, 0, 0, 1, 5, Qt::AlignLeading);
@@ -81,7 +81,8 @@ void MainWindow::createStatusBar()
     logoPixmap = new QPixmap(":/propulse_logo.png");
     logoLbl->setPixmap(*logoPixmap);
     logoLbl->setScaledContents(true);
-    logoLbl->setMaximumSize(QSize(150, 75));
+    logoLbl->setMaximumSize(QSize(globals::STATUSBAR_LOGO_WIDTH,
+                                  globals::STATUSBAR_LOGO_HEIGHT));
 
     statusMidContainer = new QWidget;
     missionTimeLbl = new QLabel("Mission Time:");
