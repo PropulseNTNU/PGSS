@@ -1,0 +1,11 @@
+QWidget#centralWidget {
+  background-image: url(:/bg_blue.png);
+  background-color:blue;
+   }
+
+QPushButton{
+background-color: black);
+
+border-style: thin;
+border-width: 5px;
+border-radius: 10px;}

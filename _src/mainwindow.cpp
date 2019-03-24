@@ -39,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent) :
     createStatusBar();
     createCentralWidget();
 
+
     // Set central widget
     setCentralWidget(centralWidget);
 }
@@ -51,7 +52,9 @@ MainWindow::~MainWindow()
 void MainWindow::createCentralWidget()
 {
     centralWidget = new QWidget;
+    centralWidget->setObjectName("centralWidget");
     controlWidget = new ControlWidget;
+    controlWidget->show();
     QGridLayout* centralLayout = new QGridLayout;
     centralLayout->addWidget(altitudeChartView);
     centralLayout->addWidget(accelerationChartView);
@@ -83,6 +86,7 @@ void MainWindow::createStatusBar()
     burnoutStateLbl = new QLabel("BURNOUT");
     airbrakesStateLbl = new QLabel("BRAKES");
     apogeeStateLbl = new QLabel("APOGEE");
+    apogeeStateLbl->setObjectName("Apogee");// gir hver enkelt en id
     landingStateLbl = new QLabel("LANDING");
     armedStateLight = new LightWidget(QColor(Qt::green));
     burnoutStateLight = new LightWidget(QColor(Qt::green));

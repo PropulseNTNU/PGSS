@@ -33,6 +33,7 @@ void ControlWidget::createLeftSide()
 {
     leftFirstLineContainer = new QWidget;
     baudRateLbl = new QLabel("Baud rate:");
+    baudRateLbl->setObjectName("BaudRate");
     baudRateLEdit = new QLineEdit(QString::number(globals::SERIAL_BAUD_RATE));
     baudRateBtn = new QPushButton("Set");
     connect(baudRateBtn, &QPushButton::clicked, [this] {
