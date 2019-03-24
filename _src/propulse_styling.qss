@@ -1,0 +1,6 @@
+QWidget { color: red }
+
+QPushButton { color: red;
+            background-color: blue}
+QLineEdit { color: red }
+QComboBox { color: red }

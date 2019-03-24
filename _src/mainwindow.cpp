@@ -35,8 +35,9 @@ MainWindow::MainWindow(QWidget *parent) :
     // Create widgets
     createChartViews();
     createMenuBar();
-    createGPSMap();
+   // createGPSMap();
     createStatusBar();
+    createDataSection();
     createCentralWidget();
 
     // Set central widget
@@ -51,10 +52,24 @@ MainWindow::~MainWindow()
 void MainWindow::createCentralWidget()
 {
     centralWidget = new QWidget;
+    centralWidget->setStyleSheet("background-image:url(\"propulse_logo.png\")");
+    centralWidget->setObjectName("centralWidget");
     controlWidget = new ControlWidget;
+
+
+
     QGridLayout* centralLayout = new QGridLayout;
-    centralLayout->addWidget(altitudeChartView);
-    centralLayout->addWidget(accelerationChartView);
+    // QWidget * widget, int fromRow, int fromColumn, int rowSpan, int columnSpan, Qt::Alignment alignment
+    centralLayout->addWidget(statusBarContainer, 0, 0, 1, 10,  Qt::AlignLeft);
+    centralLayout->addWidget(dataSectionContainer, 1, 0, 3, 4,  Qt::AlignLeft);
+    centralLayout->addWidget(chartContainer, 1, 4, 3, 6, Qt::AlignCenter);
+    centralLayout->addWidget(controlWidget, 4, 0, 2, 10, Qt::AlignBaseline);
+    /*
+    centralLayout->addWidget(statusBarContainer, 0, 0, 1, 5, Qt::AlignLeading);
+    centralLayout->addWidget(topDataContainer, 1, 0, 2, 2, Qt::AlignLeading);
+    centralLayout->addWidget(bottomDataContainer, 3, 0, 1, 2, Qt::AlignLeading);
+    centralLayout->addWidget(altitudeChartView, 0, 5, Qt::AlignTrailing);
+    centralLayout->addWidget(accelerationChartView, 1, 5, Qt::AlignTrailing); */
     centralWidget->setLayout(centralLayout);
 }
 
@@ -112,7 +127,7 @@ void MainWindow::createStatusBar()
 }
 
 void MainWindow::createDataSection() {
-    dataSectioWidget = new QWidget;
+    dataSectionContainer = new QWidget;
 
     topDataContainer = new QWidget;
     topLabel = new QLabel("Speed and location:");
@@ -131,19 +146,20 @@ void MainWindow::createDataSection() {
     gpsRightLbl = new QLabel("00.000");
     QGridLayout* topDataLayout = new QGridLayout;
     topDataLayout->addWidget(topLabel, 0, 0, Qt::AlignLeft);
-    topDataLayout->addWidget(altitudeLeftLbL, 1, 0, Qt::AlignCenter);
-    topDataLayout->addWidget(altitudeRightLbl, 1, 1, Qt::AlignCenter);
-    topDataLayout->addWidget(maxAltitudeLeftLbL, 2, 0, Qt::AlignCenter);
-    topDataLayout->addWidget(maxAltiudeRightLbl, 2, 1, Qt::AlignCenter);
-    topDataLayout->addWidget(velocityLeftLbL, 3, 0, Qt::AlignCenter);
-    topDataLayout->addWidget(velocityRightLbl, 3, 1, Qt::AlignCenter);
-    topDataLayout->addWidget(maxVelocityLeftLbL, 4, 0, Qt::AlignCenter);
-    topDataLayout->addWidget(maxVelocityRightLbl, 4, 1, Qt::AlignCenter);
-    topDataLayout->addWidget(accelerationLeftLbL, 5, 0, Qt::AlignCenter);
-    topDataLayout->addWidget(accelerationRightLbl, 5, 1, Qt::AlignCenter);
-    topDataLayout->addWidget(gpsLeftLbl, 6, 0, Qt::AlignCenter);
-    topDataLayout->addWidget(gpsMidLbl, 6, 1, Qt::AlignCenter);
-    topDataLayout->addWidget(gpsRightLbl, 6, 2, Qt::AlignCenter);
+    topDataLayout->addWidget(altitudeLeftLbL, 1, 0, Qt::AlignLeft);
+    topDataLayout->addWidget(altitudeRightLbl, 1, 1, Qt::AlignLeft);
+    topDataLayout->addWidget(maxAltitudeLeftLbL, 2, 0, Qt::AlignLeft);
+    topDataLayout->addWidget(maxAltiudeRightLbl, 2, 1, Qt::AlignLeft);
+    topDataLayout->addWidget(velocityLeftLbL, 3, 0, Qt::AlignLeft);
+    topDataLayout->addWidget(velocityRightLbl, 3, 1, Qt::AlignLeft);
+    topDataLayout->addWidget(maxVelocityLeftLbL, 4, 0, Qt::AlignLeft);
+    topDataLayout->addWidget(maxVelocityRightLbl, 4, 1, Qt::AlignLeft);
+    topDataLayout->addWidget(accelerationLeftLbL, 5, 0, Qt::AlignLeft);
+    topDataLayout->addWidget(accelerationRightLbl, 5, 1, Qt::AlignLeft);
+    topDataLayout->addWidget(gpsLeftLbl, 6, 0, Qt::AlignLeft);
+    topDataLayout->addWidget(gpsMidLbl, 6, 1, Qt::AlignLeft);
+    topDataLayout->addWidget(gpsRightLbl, 6, 2, Qt::AlignLeft);
+    topDataContainer->setLayout(topDataLayout);
 
     bottomDataContainer = new QWidget;
     pitchLeftLbl = new QLabel("Pitch");
@@ -159,12 +175,29 @@ void MainWindow::createDataSection() {
     yawRateLeftLbl = new QLabel("Yaw Rate");
     yawRateRightLbl = new QLabel("0000");
     QGridLayout* bottomDataLayout = new QGridLayout;
-    bottomDataLayout->addWidget(pitchLeftLbl, 0, 0, Qt::AlignCenter);
+    bottomDataLayout->addWidget(pitchLeftLbl, 0, 0, Qt::AlignLeft);
+    bottomDataLayout->addWidget(pitchRightLbl,0, 1, Qt::AlignLeft);
+    bottomDataLayout->addWidget(pitchRateLeftLbl, 0, 2, Qt::AlignLeft);
+    bottomDataLayout->addWidget(pitchRateRightLbl, 0, 3, Qt::AlignLeft);
+    bottomDataLayout->addWidget(rollLeftLbl, 1, 0, Qt::AlignLeft);
+    bottomDataLayout->addWidget(rollRightLbl, 1, 1, Qt::AlignLeft);
+    bottomDataLayout->addWidget(rollRateLeftLbl, 1, 2, Qt::AlignLeft);
+    bottomDataLayout->addWidget(rollRateRightLbl, 1, 3, Qt::AlignLeft);
+    bottomDataLayout->addWidget(yawLeftLbl, 2, 0, Qt::AlignLeft);
+    bottomDataLayout->addWidget(yawRightLbl, 2, 1, Qt::AlignLeft);
+    bottomDataLayout->addWidget(yawRateLeftLbl, 2, 2, Qt::AlignLeft);
+    bottomDataLayout->addWidget(yawRateRightLbl, 2, 3, Qt::AlignLeft);
+    bottomDataContainer->setLayout(bottomDataLayout);
 
-
+    QVBoxLayout* dataSectionLayout = new QVBoxLayout;
+    dataSectionLayout->addWidget(topDataContainer);
+    dataSectionLayout->addWidget(bottomDataContainer);
+    dataSectionContainer->setLayout(dataSectionLayout);
 }
 
 void MainWindow::createChartViews() {
+    chartContainer = new QWidget;
+
     // Setup chart and add to chartView
     altitudeChart = new RealTimeChart;
     accelerationChart = new RealTimeChart;
@@ -192,6 +225,11 @@ void MainWindow::createChartViews() {
     timer->setInterval(globals::TIMER_UPDATE);
     timer->start();
     connect(timer, &QTimer::timeout, this, &MainWindow::updateRealTimeVisuals);
+
+    QHBoxLayout* chartLayout = new QHBoxLayout;
+    chartLayout->addWidget(altitudeChartView);
+    chartLayout->addWidget(accelerationChartView);
+    chartContainer->setLayout(chartLayout);
 }
 
 void MainWindow::createMenuBar() {

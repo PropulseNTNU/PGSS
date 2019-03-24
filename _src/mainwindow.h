@@ -65,7 +65,7 @@ private:
     LightWidget* landingStateLight;
 
     void createDataSection();
-    QWidget* dataSectioWidget;
+    QWidget* dataSectionContainer;
 
     QWidget* topDataContainer;
     QLabel* topLabel;
@@ -98,6 +98,7 @@ private:
     QLabel* yawRateRightLbl;
 
     void createChartViews();
+    QWidget* chartContainer;
     RealTimeChart* altitudeChart;
     RealTimeChart* accelerationChart;
     QtCharts::QChartView* altitudeChartView;
