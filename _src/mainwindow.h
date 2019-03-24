@@ -68,7 +68,7 @@ private:
     QWidget* dataSectionContainer;
 
     QWidget* topDataContainer;
-    QLabel* topLabel;
+    QLabel* topDataLabel;
     QLabel* altitudeLeftLbL;
     QLabel* altitudeRightLbl;
     QLabel* maxAltitudeLeftLbL;
@@ -84,6 +84,7 @@ private:
     QLabel* gpsRightLbl;
 
     QWidget* bottomDataContainer;
+    QLabel* bottomDataLabel;
     QLabel* pitchLeftLbl;
     QLabel* pitchRightLbl;
     QLabel* rollLeftLbl;
