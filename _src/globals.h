@@ -6,8 +6,8 @@
 namespace globals {
     const int CHART_YRANGE = 500;
     const int CHART_XRANGE = 10;
-    const int CHART_WIN_MIN_WIDTH = 400;
-    const int CHART_WIN_MIN_HEIGHT = 225;
+    const int CHART_WIN_MIN_WIDTH = 450;
+    const int CHART_WIN_MIN_HEIGHT = 350;
 
     const int TIMER_UPDATE = 100;
 
@@ -22,6 +22,9 @@ namespace globals {
     const int SERIAL_BAUD_RATE = 115200;
 
     const int LIGHTWIDGET_MIN_SIZE = 20;
+
+    const int STATUSBAR_LOGO_WIDTH = 197;
+    const int STATUSBAR_LOGO_HEIGHT = 93;
 
     const QString DEFAULT_DATA_PATH = "/";
     const QString DEFAULT_DATA_FILENAME = "launch_data.txt";
