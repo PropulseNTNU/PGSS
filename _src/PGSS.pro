@@ -6,9 +6,9 @@
 #
 #---------------------------------------------------
 
-QT       += widgets core gui charts serialport \
-            3dcore 3drender 3dinput 3dextras \
-            quickwidgets location
+QT       += core gui charts serialport 3dcore 3drender 3dinput 3dextras sensors
+
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = PGSS
 TEMPLATE = app
