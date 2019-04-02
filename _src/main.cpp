@@ -9,6 +9,8 @@ int main(int argc, char *argv[])
     a.setOrganizationName("Propulse NTNU");
     a.setOrganizationDomain("www.propulsentnu.no");
     a.setStyleSheet(":/propulse_styling.qss");
+    
+    QFontDatabase::addApplicationFont(":/fonts/titilliumweb/TitilliumWeb-Regular.ttf");
 
     // Add styling
     QFile styleSheetFile(":/propulse_styling.qss");

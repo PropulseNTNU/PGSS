@@ -77,10 +77,11 @@ void MainWindow::createStatusBar()
 
     statusMidContainer = new QWidget;
     missionTimeLbl = new QLabel("Mission Time:");
-    missionTimeLbl->setObjectName("timeLabel");
+    missionTimeLbl->setObjectName("mTimeLabel");
     timeLbl = new QLabel("00:00:00:00");
     timeLbl->setObjectName("timeLabel");
     timeExpLbl = new QLabel("HH:MM:SS:MS");
+    timeExpLbl->setObjectName("timeLabel");
     QVBoxLayout* statusMidLayout = new QVBoxLayout;
     statusMidLayout->addWidget(missionTimeLbl, Qt::AlignLeft);
     statusMidLayout->addWidget(timeLbl, Qt::AlignLeft);
@@ -137,9 +138,9 @@ void MainWindow::createDataSection()
     altitudeRightLbl = new QLabel("0000");
     altitudeRightLbl->setObjectName("dataLabel");
     maxAltitudeLeftLbL = new QLabel("Max Altitude [m]");
-    maxAltitudeLeftLbL->setObjectName("descriptionLabel");
+    maxAltitudeLeftLbL->setObjectName("MdescriptionLabel");
     maxAltiudeRightLbl = new QLabel("0000");
-    maxAltiudeRightLbl->setObjectName("dataLabel");
+    maxAltiudeRightLbl->setObjectName("MdataLabel");
     velocityLeftLbL = new QLabel("Current Velocity [m/s]");
     velocityLeftLbL->setObjectName("descriptionLabel");
     velocityRightLbl = new QLabel("000");
