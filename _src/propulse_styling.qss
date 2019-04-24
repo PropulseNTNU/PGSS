@@ -1,6 +1,125 @@
-QWidget { color: red }
+/*Setting pic as backgound*/
+QWidget#centralWidget {
+  background-image: url(:/bg_blue.png);
+  background-color:blue;
+   }
 
-QPushButton { color: red;
-            background-color: blue}
-QLineEdit { color: red }
-QComboBox { color: red }
+QPushButton {
+color: black;
+padding: 4px;
+font-size: 16px;
+margin-top: 5px;
+font-family: monospace;
+}
+
+
+QWidget#topDataLabel {
+color: white;
+padding: 4px;
+font-size:24px ;
+font: 'TitilliumWeb-Regular';
+}
+
+QWidget#descriptionLabel {
+color: gray;
+padding: 4px;
+font-size: 18px;
+font-family: monospace;
+}
+
+QWidget#MdescriptionLabel {
+color: gray;
+font: bold;
+padding: 4px;
+font-size: 18px;
+font-family: monospace;
+}
+
+QWidget#MdataLabel {
+color: gray;
+padding: 4px;
+font: bold;
+font-size: 18px;
+border: 2px solid blue;
+border-style: groove;
+font-family: monospace;
+}
+
+QWidget#dataLabel {
+color: gray;
+padding: 4px;
+font-size: 18px;
+border: 2px solid blue;
+border-style: groove;
+font-family: monospace;
+}
+
+QWidget#bottomDataLable {
+color: white;
+padding: 4px;
+font-size: 18px;
+font-family: monospace;
+}
+
+QLabel#mTimeLabel {
+color: white;
+padding: 2px;
+font-size: 24px;
+font-family: monospace;
+}
+
+QLabel#timeLabel {
+color: white;
+padding: 2px;
+font-size: 24px;
+font-family: monospace;
+}
+
+QWidget#BaudRate {
+color: white;
+padding: 2px;
+font-size: 18px;
+font-family: monospace;
+}
+
+QWidget#DataStorage {
+color: white;
+padding: 2px;
+font-size: 18px;
+font-family: monospace;
+}
+
+QWidget#Path {
+color: white;
+padding: 2px;
+font-size: 18px;
+font-family: monospace;
+}
+
+QWidget#Set {
+color: black;
+padding: 2px;
+font-size: 18px;
+font-family: monospace;
+}
+
+QWidget#Filename {
+color: white;
+padding: 2px;
+font-size: 18px;
+font-family: monospace;
+}
+
+QWidget#Device {
+color: white;
+padding: 2px;
+font-size: 18px;
+font-family: monospace;
+}
+
+QWidget#None {
+color: white;
+padding: 2px;
+font-size: 18px;
+font-family: monospace;
+}

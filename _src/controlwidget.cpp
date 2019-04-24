@@ -33,6 +33,7 @@ void ControlWidget::createLeftSide()
 {
     leftFirstLineContainer = new QWidget;
     baudRateLbl = new QLabel("Baud rate:");
+    baudRateLbl->setObjectName("BaudRate");
     baudRateLEdit = new QLineEdit(QString::number(globals::SERIAL_BAUD_RATE));
     baudRateBtn = new QPushButton("Apply");
     connect(baudRateBtn, &QPushButton::clicked, [this] {
@@ -46,7 +47,9 @@ void ControlWidget::createLeftSide()
 
     leftSecondLineContainer = new QWidget;
     deviceLbl = new QLabel("Device:");
+    deviceLbl->setObjectName("Device");
     deviceNameLbl = new QLabel("None");
+    deviceNameLbl->setObjectName("None");
     QHBoxLayout* secondLineLayout = new QHBoxLayout;
     secondLineLayout->addWidget(deviceLbl);
     secondLineLayout->addWidget(deviceNameLbl);
@@ -64,11 +67,14 @@ void ControlWidget::createRightSide()
 {
 
     topRightLbl = new QLabel("Data storage");
+    topRightLbl->setObjectName("DataStorage");
 
     rightFirstLineContainer = new QWidget;
     pathLbl = new QLabel("Path:");
+    pathLbl->setObjectName("Path");
     pathLEdit = new QLineEdit(dataPath);
     pathBtn = new QPushButton("Set");
+    pathBtn->setObjectName("Set");
     connect(pathBtn, &QPushButton::clicked, [this] {
         emit this->filenameChanged(this->dataPath+this->dataFilename);
     });
@@ -81,8 +87,10 @@ void ControlWidget::createRightSide()
     // Second line
     rightSecondLineContainer = new QWidget;
     filenameLbl = new QLabel("Filename:");
+    filenameLbl->setObjectName("Filename");
     filenameLEdit = new QLineEdit(dataFilename);
     filenameBtn = new QPushButton("Set");
+    filenameBtn->setObjectName("Set");
     QHBoxLayout* rightSecondLineContainerLayout = new QHBoxLayout;
     rightSecondLineContainerLayout->addWidget(filenameLbl);
     rightSecondLineContainerLayout->addWidget(filenameLEdit);
