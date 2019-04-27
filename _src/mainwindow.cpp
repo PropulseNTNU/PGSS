@@ -87,9 +87,12 @@ void MainWindow::createStatusBar()
     statusMidLayout->addWidget(missionTimeLbl, Qt::AlignLeft);
     statusMidLayout->addWidget(timeLbl, Qt::AlignLeft);
     statusMidLayout->addWidget(timeExpLbl, Qt::AlignLeft);
+    statusMidLayout->insertSpacing(0, 100);
+    statusMidLayout->insertSpacing(4, 100);
     statusMidContainer->setLayout(statusMidLayout);
 
     statusRightContainer = new QWidget;
+
     armedStateLbl = new QLabel("ARMED");
     armedStateLbl->setObjectName("descriptionLabel");
     burnoutStateLbl = new QLabel("BURNOUT");
@@ -105,17 +108,22 @@ void MainWindow::createStatusBar()
     airbrakesStateLight = new LightWidget(QColor(Qt::green));
     apogeeStateLight = new LightWidget(QColor(Qt::green));
     landingStateLight = new LightWidget(QColor(Qt::green));
-    QGridLayout* statusRightLayout = new QGridLayout;
-    statusRightLayout->addWidget(armedStateLight, 0, 0, Qt::AlignCenter);
-    statusRightLayout->addWidget(burnoutStateLight, 0, 1, Qt::AlignCenter);
-    statusRightLayout->addWidget(airbrakesStateLight, 0, 2, Qt::AlignCenter);
-    statusRightLayout->addWidget(apogeeStateLight, 0, 3, Qt::AlignCenter);
-    statusRightLayout->addWidget(landingStateLight, 0, 4, Qt::AlignCenter);
-    statusRightLayout->addWidget(armedStateLbl, 1, 0, Qt::AlignCenter);
-    statusRightLayout->addWidget(burnoutStateLbl, 1, 1, Qt::AlignCenter);
-    statusRightLayout->addWidget(airbrakesStateLbl, 1, 2, Qt::AlignCenter);
-    statusRightLayout->addWidget(apogeeStateLbl, 1, 3, Qt::AlignCenter);
-    statusRightLayout->addWidget(landingStateLbl, 1, 4, Qt::AlignCenter);
+    QGridLayout* statusRightGridLayout = new QGridLayout;
+    statusRightGridLayout->addWidget(armedStateLight, 0, 0, Qt::AlignCenter);
+    statusRightGridLayout->addWidget(burnoutStateLight, 0, 1, Qt::AlignCenter);
+    statusRightGridLayout->addWidget(airbrakesStateLight, 0, 2, Qt::AlignCenter);
+    statusRightGridLayout->addWidget(apogeeStateLight, 0, 3, Qt::AlignCenter);
+    statusRightGridLayout->addWidget(landingStateLight, 0, 4, Qt::AlignCenter);
+    statusRightGridLayout->addWidget(armedStateLbl, 1, 0, Qt::AlignCenter);
+    statusRightGridLayout->addWidget(burnoutStateLbl, 1, 1, Qt::AlignCenter);
+    statusRightGridLayout->addWidget(airbrakesStateLbl, 1, 2, Qt::AlignCenter);
+    statusRightGridLayout->addWidget(apogeeStateLbl, 1, 3, Qt::AlignCenter);
+    statusRightGridLayout->addWidget(landingStateLbl, 1, 4, Qt::AlignCenter);
+
+    QVBoxLayout* statusRightLayout = new QVBoxLayout;
+    statusRightLayout->addLayout(statusRightGridLayout);
+    statusRightLayout->insertSpacing(0, 100);
+    statusRightLayout->insertSpacing(2, 100);
     statusRightContainer->setLayout(statusRightLayout);
 
     armedStateLight->turnOn();
