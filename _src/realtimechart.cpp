@@ -12,9 +12,6 @@ RealTimeChart::RealTimeChart(QGraphicsItem* parent, Qt::WindowFlags wFlags) :
     // Create new series
     newSeries();
 
-    // Configure chart
-    setMinimumSize(QSize(globals::CHART_WIN_MIN_WIDTH,
-                         globals::CHART_WIN_MIN_HEIGHT));
     legend()->hide();
 
 }

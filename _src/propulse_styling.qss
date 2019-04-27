@@ -12,6 +12,9 @@ margin-top: 5px;
 font-family: monospace;
 }
 
+QFrame#spacerLine {
+background-color: blank;
+}
 
 QWidget#topDataLabel {
 color: white;

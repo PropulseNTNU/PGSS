@@ -59,8 +59,9 @@ void MainWindow::createCentralWidget()
     QGridLayout* centralLayout = new QGridLayout;
     centralLayout->addWidget(statusBarContainer, 0, 0, 1, 10,  Qt::AlignLeft);
     centralLayout->addWidget(dataSectionContainer, 1, 0, 3, 4,  Qt::AlignLeft);
-    centralLayout->addWidget(chartContainer, 1, 4, 3, 6, Qt::AlignTop);
-    centralLayout->addWidget(controlWidget, 4, 0, 2, 10, Qt::AlignBaseline);
+    centralLayout->addWidget(chartContainer, 1, 4, 4, 6);
+    centralLayout->addWidget(controlWidget, 5, 0, 1, 10, Qt::AlignBottom);
+    centralLayout->setVerticalSpacing(0);
     centralWidget->setLayout(centralLayout);
 }
 
@@ -123,6 +124,7 @@ void MainWindow::createStatusBar()
     statusBarLayout->addWidget(logoLbl);
     statusBarLayout->addWidget(statusMidContainer);
     statusBarLayout->addWidget(statusRightContainer);
+    statusBarLayout->setSpacing(0);
     statusBarContainer->setLayout(statusBarLayout);
 }
 
@@ -227,10 +229,16 @@ void MainWindow::createDataSection()
 void MainWindow::createChartViews()
 {
     chartContainer = new QWidget;
+    QSizePolicy sizePol = chartContainer->sizePolicy();
+    sizePol.setHorizontalStretch(2);
+    chartContainer->setSizePolicy(sizePol);
 
     // Setup chart and add to chartView
     altitudeChart = new RealTimeChart;
+    QSizePolicy sizePolAlt = altitudeChart->sizePolicy();
+
     accelerationChart = new RealTimeChart;
+    QSizePolicy sizePolAccel = altitudeChart->sizePolicy();
 
     altitudeChart->setXAxisTitle("Time [s]");
     altitudeChart->setYAxisTitle("Altitude [m]");
@@ -241,14 +249,6 @@ void MainWindow::createChartViews()
     accelerationChartView = new QChartView(accelerationChart, this);
 
     altitudeChartView->setRenderHint(QPainter::Antialiasing);
-    altitudeChartView->setMinimumSize(
-                QSize(globals::CHART_WIN_MIN_WIDTH,
-                      globals::CHART_WIN_MIN_HEIGHT));
-
-    accelerationChartView->setRenderHint(QPainter::Antialiasing);
-    accelerationChartView->setMinimumSize(
-                QSize(globals::CHART_WIN_MIN_WIDTH,
-                      globals::CHART_WIN_MIN_HEIGHT));
 
     // Setup timer for updating real time plot
     timer = new QTimer;

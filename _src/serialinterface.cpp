@@ -11,7 +11,7 @@
 SerialInterface::SerialInterface(QObject* parent) : buffer(""),
     baudRate(globals::SERIAL_BAUD_RATE), dataFilePath(""),
     packageNumber(0) {
-    sensorData = new double[NUM_TYPES];
+    sensorData = new double[NUM_TYPES+NUM_SENSORS];
     dataFile = new QFile(dataFilePath+"launch_data.txt");
     if (!dataFile->open(QIODevice::ReadWrite))
         qDebug() << "Could not open:";
@@ -56,7 +56,8 @@ void SerialInterface::readSerial() {
     buffer += data;
     if (buffer.size() > globals::SERIAL_BUFFER_SIZE)
         buffer.clear();
-    read_buffer(buffer, (uint8_t*)sensorData, NUM_TYPES*sizeof(double), &packageNumber);
+    read_buffer(buffer, (uint8_t*)sensorData,
+                (NUM_TYPES+NUM_SENSORS)*sizeof(double), &packageNumber);
 }
 
 bool SerialInterface::setBaudRate(qint32 baudRate) {

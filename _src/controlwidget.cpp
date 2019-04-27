@@ -21,10 +21,22 @@ ControlWidget::ControlWidget(QWidget *parent) : QWidget(parent),
     QSizePolicy sizePolicy = outputList->sizePolicy();
     sizePolicy.setHorizontalStretch(5);
     outputList->setSizePolicy(sizePolicy);
-    QGridLayout* centralLayout = new QGridLayout;
-    centralLayout->addWidget(leftSideBox, 0, 0, 0, 1);
-    centralLayout->addWidget(outputList, 0, 1, 0, 5);
-    centralLayout->addWidget(rightSideBox, 0, 6, 0, 1);
+
+    /*
+    spacerLine = new QFrame;
+    spacerLine->setFrameShape(QFrame::HLine);
+    spacerLine->setFrameShadow(QFrame::Sunken);
+    spacerLine->setObjectName("spacerLine");
+    */
+
+    QGridLayout* gridLayout = new QGridLayout;
+    gridLayout->addWidget(leftSideBox, 0, 0, 0, 1);
+    gridLayout->addWidget(outputList, 0, 1, 0, 5);
+    gridLayout->addWidget(rightSideBox, 0, 6, 0, 1);
+
+    QVBoxLayout* centralLayout = new QVBoxLayout;
+    // centralLayout->addWidget(spacerLine);
+    centralLayout->addLayout(gridLayout);
 
     setLayout(centralLayout);
 }
@@ -59,7 +71,7 @@ void ControlWidget::createLeftSide()
     QVBoxLayout* leftSideBoxLayout = new QVBoxLayout;
     leftSideBoxLayout->addWidget(leftFirstLineContainer);
     leftSideBoxLayout->addWidget(leftSecondLineContainer);
-    leftSideBoxLayout->setSpacing(0);
+   // leftSideBoxLayout->setSpacing(0);
     leftSideBox->setLayout(leftSideBoxLayout);
 }
 
@@ -102,7 +114,7 @@ void ControlWidget::createRightSide()
     rightSideBoxLayout->addWidget(topRightLbl);
     rightSideBoxLayout->addWidget(rightFirstLineContainer);
     rightSideBoxLayout->addWidget(rightSecondLineContainer);
-    rightSideBoxLayout->setSpacing(0);
+  //  rightSideBoxLayout->setSpacing(0);
     rightSideBox->setLayout(rightSideBoxLayout);
 }
 

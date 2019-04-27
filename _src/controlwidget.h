@@ -8,6 +8,7 @@ class QPushButton;
 class QLabel;
 class QLineEdit;
 class QGroupBox;
+class QFrame;
 
 class ControlWidget : public QWidget
 {
@@ -25,6 +26,8 @@ public slots:
     void setDeviceName(QString deviceName);
 
 private:
+    QFrame* spacerLine;
+
     /* Left */
     //  First line
     QWidget* leftFirstLineContainer;
