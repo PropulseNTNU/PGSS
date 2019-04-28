@@ -57,12 +57,15 @@ private:
     QLabel* burnoutStateLbl;
     QLabel* airbrakesStateLbl;
     QLabel* apogeeStateLbl;
-    QLabel* landingStateLbl;
+    QLabel* chuteStateLbl;
+    QLabel* landedStateLbl;
     LightWidget* armedStateLight;
     LightWidget* burnoutStateLight;
     LightWidget* airbrakesStateLight;
     LightWidget* apogeeStateLight;
-    LightWidget* landingStateLight;
+    LightWidget* chuteStateLight;
+    LightWidget* landedStateLight;
+    void updateStateVisuals(int state);
 
     void createDataSection();
     QWidget* dataSectionContainer;
@@ -118,6 +121,13 @@ private:
     QWidget* gpsMapWidget;
 
     ControlWidget* controlWidget;
+    QTimer* missionTimer;
+    int msecs;
+    int secs;
+    int min;
+    int hours;
+    void updateMissionTime();
+    void arm();
 
     SerialInterface* serialInterface;
     QString currentPort;

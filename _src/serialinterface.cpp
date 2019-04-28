@@ -45,6 +45,8 @@ bool SerialInterface::setupPort(QString portName, qint32 baudRate) {
         return false;
     }
     this->serialDevice = device;
+    //emit deviceChanged(portName);
+
     connect(serialDevice, &QSerialPort::readyRead, this, &SerialInterface::readSerial);
     return true;
 }

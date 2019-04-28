@@ -19,11 +19,13 @@ public:
 signals:
     void baudRateChanged(unsigned int baudRate);
     void filenameChanged(QString filename);
-
+    void arm();
+    void showMap();
 public slots:
     void writeToLog(QString message);
     void writeToOutput(QString message);
     void setDeviceName(QString deviceName);
+    void showMapBtn();
 
 private:
     QFrame* spacerLine;
@@ -40,6 +42,7 @@ private:
     QLabel* deviceLbl;
     QLabel* deviceNameLbl;
 
+    QPushButton* button;
     QGroupBox* leftSideBox;
     void createLeftSide();
 

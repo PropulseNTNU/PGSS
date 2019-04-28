@@ -21,7 +21,7 @@ Item {
         id: gpsMap
         anchors.fill: parent
         plugin: mapPlugin
-        center: QtPositioning.coordinate(59.91, 10.75) // Oslo
+        center: QtPositioning.coordinate(63.418, 10.401951) // Oslo
         zoomLevel: 14
 
         MapQuickItem {

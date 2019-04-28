@@ -50,6 +50,7 @@ void ControlWidget::createLeftSide()
     baudRateLbl->setObjectName("BaudRate");
     baudRateLEdit = new QLineEdit(QString::number(globals::SERIAL_BAUD_RATE));
     baudRateBtn = new QPushButton("Apply");
+    baudRateBtn->setObjectName("Set");
     connect(baudRateBtn, &QPushButton::clicked, [this] {
         emit this->baudRateChanged(this->baudRateLEdit->text().toInt());
     });
@@ -62,7 +63,7 @@ void ControlWidget::createLeftSide()
     leftSecondLineContainer = new QWidget;
     deviceLbl = new QLabel("Device:");
     deviceLbl->setObjectName("Device");
-    deviceNameLbl = new QLabel("None");
+    deviceNameLbl = new QLabel("XBee HP900");
     deviceNameLbl->setObjectName("None");
     QHBoxLayout* secondLineLayout = new QHBoxLayout;
     secondLineLayout->addWidget(deviceLbl);
@@ -73,6 +74,13 @@ void ControlWidget::createLeftSide()
     QVBoxLayout* leftSideBoxLayout = new QVBoxLayout;
     leftSideBoxLayout->addWidget(leftFirstLineContainer);
     leftSideBoxLayout->addWidget(leftSecondLineContainer);
+    button = new QPushButton("Arm");
+    button->setObjectName("Set");
+    connect(button, &QPushButton::clicked, this, [this] {
+        disconnect(button);
+        emit this->arm();
+    });
+    leftSideBoxLayout->addWidget(button);
    // leftSideBoxLayout->setSpacing(0);
     leftSideBox->setLayout(leftSideBoxLayout);
 }
@@ -133,4 +141,12 @@ void ControlWidget::writeToOutput(QString message)
 void ControlWidget::setDeviceName(QString deviceName)
 {
     deviceNameLbl->setText(deviceName);
+}
+
+void ControlWidget::showMapBtn() {
+    button->setText("Show location");
+    connect(button, &QPushButton::clicked, this, [this] {
+        emit this->showMap();
+    });
+    button->show();
 }

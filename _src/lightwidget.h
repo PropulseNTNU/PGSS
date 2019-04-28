@@ -82,10 +82,13 @@ protected:
     {
         if (!m_on)
             m_color = QColor(Qt::gray);
+        else
+            m_color = QColor(Qt::green);
         QPainter painter(this);
         painter.setRenderHint(QPainter::Antialiasing);
         painter.setBrush(m_color);
         painter.drawEllipse(0, 0, width(), height());
+        update();
     }
 
 private:

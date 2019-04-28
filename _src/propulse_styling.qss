@@ -108,7 +108,7 @@ font-family: monospace;
 
 QListWidget#Terminal{
 background-color:rgb(2,19,45);
-
+color: white
 }
 
 QWidget#Filename {

@@ -42,6 +42,10 @@ MainWindow::MainWindow(QWidget *parent) :
     createDataSection();
     createCentralWidget();
 
+    connect(controlWidget, &ControlWidget::arm, this, &MainWindow::arm);
+    connect(controlWidget, &ControlWidget::showMap, this, [this] {
+        gpsMapView->show();
+    });
 
     // Set central widget
     setCentralWidget(centralWidget);
@@ -103,24 +107,29 @@ void MainWindow::createStatusBar()
     airbrakesStateLbl->setObjectName("descriptionLabel");
     apogeeStateLbl = new QLabel("APOGEE");
     apogeeStateLbl->setObjectName("descriptionLabel");
-    landingStateLbl = new QLabel("LANDING");
-    landingStateLbl->setObjectName("descriptionLabel");
+    chuteStateLbl = new QLabel("CHUTE");
+    chuteStateLbl->setObjectName("descriptionLabel");
+    landedStateLbl = new QLabel("LANDED");
+    landedStateLbl->setObjectName("descriptionLabel");
     armedStateLight = new LightWidget(QColor(Qt::green));
     burnoutStateLight = new LightWidget(QColor(Qt::green));
     airbrakesStateLight = new LightWidget(QColor(Qt::green));
     apogeeStateLight = new LightWidget(QColor(Qt::green));
-    landingStateLight = new LightWidget(QColor(Qt::green));
+    chuteStateLight = new LightWidget(QColor(Qt::green));
+    landedStateLight = new LightWidget(QColor(Qt::green));
     QGridLayout* statusRightGridLayout = new QGridLayout;
     statusRightGridLayout->addWidget(armedStateLight, 0, 0, Qt::AlignCenter);
     statusRightGridLayout->addWidget(burnoutStateLight, 0, 1, Qt::AlignCenter);
     statusRightGridLayout->addWidget(airbrakesStateLight, 0, 2, Qt::AlignCenter);
     statusRightGridLayout->addWidget(apogeeStateLight, 0, 3, Qt::AlignCenter);
-    statusRightGridLayout->addWidget(landingStateLight, 0, 4, Qt::AlignCenter);
+    statusRightGridLayout->addWidget(chuteStateLight, 0, 4, Qt::AlignCenter);
+    statusRightGridLayout->addWidget(landedStateLight, 0, 5, Qt::AlignCenter);
     statusRightGridLayout->addWidget(armedStateLbl, 1, 0, Qt::AlignCenter);
     statusRightGridLayout->addWidget(burnoutStateLbl, 1, 1, Qt::AlignCenter);
     statusRightGridLayout->addWidget(airbrakesStateLbl, 1, 2, Qt::AlignCenter);
     statusRightGridLayout->addWidget(apogeeStateLbl, 1, 3, Qt::AlignCenter);
-    statusRightGridLayout->addWidget(landingStateLbl, 1, 4, Qt::AlignCenter);
+    statusRightGridLayout->addWidget(chuteStateLbl, 1, 4, Qt::AlignCenter);
+    statusRightGridLayout->addWidget(landedStateLbl, 1, 5, Qt::AlignCenter);
 
     QVBoxLayout* statusRightLayout = new QVBoxLayout;
     statusRightLayout->addLayout(statusRightGridLayout);
@@ -128,8 +137,6 @@ void MainWindow::createStatusBar()
     statusRightLayout->insertSpacing(2, 100);
     statusRightContainer->setLayout(statusRightLayout);
 
-    armedStateLight->turnOn();
-    burnoutStateLight->turnOn();
     QHBoxLayout* statusBarLayout = new QHBoxLayout;
     statusBarLayout->addWidget(logoLbl);
     statusBarLayout->addWidget(statusMidContainer);
@@ -167,9 +174,9 @@ void MainWindow::createDataSection()
     accelerationRightLbl->setObjectName("dataLabel");
     gpsLeftLbl = new QLabel("GPS Location (lat,long)");
     gpsLeftLbl->setObjectName("descriptionLabel");
-    gpsMidLbl = new QLabel("00.000");
+    gpsMidLbl = new QLabel("63.418");
     gpsMidLbl->setObjectName("dataLabel");
-    gpsRightLbl = new QLabel("00.000");
+    gpsRightLbl = new QLabel("10.402");
     gpsRightLbl->setObjectName("dataLabel");
     QGridLayout* topDataLayout = new QGridLayout;
     topDataLayout->addWidget(topDataLabel, 0, 0, Qt::AlignLeft);
@@ -296,8 +303,7 @@ void MainWindow::createGPSMap()
     //QDockWidget* gpsMapDock = new QDockWidget("GPS map", this);
 
     gpsMapView = new QQuickWidget;
-    gpsMapView->setSource(QUrl(QStringLiteral("qrc:/gps_map.qml")));
-    gpsMapView->show();
+    gpsMapView->setSource(QUrl(QStringLiteral("qrc:/gps_map.qml"))); 
 
     //gpsMapDock->setWidget(gpsMapView);
     //addDockWidget(Qt::RightDockWidgetArea, gpsMapDock);
@@ -323,7 +329,6 @@ void MainWindow::updateRealTimeVisuals()
         maxAltiudeRightLbl->setText(QString::number(maxAltitude));
     }
     //velocityRightLbl
-
     //maxVelocityRightLbl
 
     accelerationRightLbl->setText(QString::number(data[ACC_Y]));
@@ -341,6 +346,7 @@ void MainWindow::updateRealTimeVisuals()
     if (data[ALTITUDE] > 0)
         this->altitudeChart->update(data[ALTITUDE]);
     this->accelerationChart->update(data[ACC_Y]);
+    updateStateVisuals(data[STATE]);
 
 /*
         double* sensorData = this->serialInterface->getSensorData();
@@ -365,4 +371,67 @@ void MainWindow::updateRealTimeVisuals()
                                       Q_ARG(QVariant, longitudeQV));
         }
     */
+}
+
+void MainWindow::arm() {
+    missionTimer = new QTimer;
+    missionTimer->setInterval(100);
+    armedStateLight->turnOn();
+    missionTimer->start();
+    connect(missionTimer, &QTimer::timeout, this, &MainWindow::updateMissionTime);
+
+    controlWidget->writeToOutput("Rocket armed & ready for take off.");
+}
+
+void MainWindow::updateMissionTime() {
+    msecs += 100;
+    if (msecs >= 1000) {
+        secs += 1;
+        msecs -= 1000;
+    }
+    if (secs >= 60) {
+        min += 1;
+        secs -= 60;
+    }
+    if (min >= 60) {
+        hours += 1;
+        min -= 60;
+    }
+    timeLbl->setText(QTime(hours, min, secs, msecs).toString("hh:mm:ss:zzz"));
+}
+
+void MainWindow::updateStateVisuals(int state) {
+    switch (state) {
+        case globals::state::AIRBRAKES:
+            airbrakesStateLight->turnOn();
+            controlWidget->writeToOutput(
+                        QTime(hours, min, secs, msecs).toString("hh:mm:ss:zzz")
+                        + "  Entering airbrakes state.");
+            break;
+        case globals::state::APOGEE:
+            controlWidget->writeToOutput(
+                    QTime(hours, min, secs, msecs).toString("hh:mm:ss:zzz")
+                    + "  Reached apogee.");
+            apogeeStateLight->turnOn();
+            break;
+        case globals::state::BURNOUT:
+            controlWidget->writeToOutput(
+                        QTime(hours, min, secs, msecs).toString("hh:mm:ss:zzz")
+                        + "  Motor burnout reached.");
+            burnoutStateLight->turnOn();
+            break;
+        case globals::state::CHUTE:
+            controlWidget->writeToOutput(
+                    QTime(hours, min, secs, msecs).toString("hh:mm:ss:zzz")
+                    + "  Main chute deployed.");
+            burnoutStateLight->turnOn();
+            break;
+        case globals::state::LANDED:
+            controlWidget->writeToOutput(
+                        QTime(hours, min, secs, msecs).toString("hh:mm:ss:zzz")
+                        + "  The rocket has landed, press \"Show location\" to show location on map.");
+            landedStateLight->turnOn();
+            controlWidget->showMapBtn();
+            break;
+    }
 }

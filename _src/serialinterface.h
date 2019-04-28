@@ -10,6 +10,8 @@
 class QSerialPort;
 
 class SerialInterface : public QObject {
+signals:
+    void deviceChanged(QString /* Device Name */);
 public:
     SerialInterface(QObject* parent = 0);
     ~SerialInterface();
@@ -34,6 +36,7 @@ private:
 
     QFile *dataFile; // File object for storing all incoming raw data
     QString dataFilePath;
+
 };
 
 #endif // SERIALINTERFACE_H

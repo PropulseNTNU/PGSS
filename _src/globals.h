@@ -28,8 +28,13 @@ namespace globals {
     const int STATUSBAR_LOGO_WIDTH = 380;
     const int STATUSBAR_LOGO_HEIGHT = 180;
 
-    const QString DEFAULT_DATA_PATH = "/";
+    const QString DEFAULT_DATA_PATH = "/Important_Rocket_data/";
     const QString DEFAULT_DATA_FILENAME = "launch_data.txt";
+
+    enum state {
+        IDLE, ARMED, BURNOUT, AIRBRAKES,
+        APOGEE, DROGUE, CHUTE, LANDED, NUM_STATES
+    };
 }
 
 #endif // GLOBALS_H
