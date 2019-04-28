@@ -17,6 +17,8 @@ ControlWidget::ControlWidget(QWidget *parent) : QWidget(parent),
     createLeftSide();
     createRightSide();
     outputList = new QListWidget;
+    outputList->setObjectName("Terminal");
+
     outputList->setSelectionMode(QAbstractItemView::NoSelection);
     QSizePolicy sizePolicy = outputList->sizePolicy();
     sizePolicy.setHorizontalStretch(5);
