@@ -125,10 +125,10 @@ void ControlWidget::writeToLog(QString message)
 
 void ControlWidget::writeToOutput(QString message)
 {
-
+    outputList->addItem(message);
 }
 
 void ControlWidget::setDeviceName(QString deviceName)
 {
-
+    deviceNameLbl->setText(deviceName);
 }

@@ -123,6 +123,10 @@ private:
     QString currentPort;
     QTimer* timer;
     ControlWidget* test;
+    double maxAltitude;
+    double prevPitch;
+    double prevRoll;
+    double prevYaw;
 };
 
 #endif // MAINWINDOW_H

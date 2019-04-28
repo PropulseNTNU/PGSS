@@ -27,7 +27,9 @@
 #include <QGridLayout>
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent), currentPort("")
+    QMainWindow(parent), currentPort(""),
+    maxAltitude(0), prevPitch(0), prevRoll(0),
+    prevYaw(0)
 {
     // Create a serial interface
     serialInterface = new SerialInterface(this);
@@ -35,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Create widgets
     createChartViews();
     createMenuBar();
-   // createGPSMap();
+    createGPSMap();
     createStatusBar();
     createDataSection();
     createCentralWidget();
@@ -291,14 +293,14 @@ void MainWindow::createNavball()
 
 void MainWindow::createGPSMap()
 {
-    QDockWidget* gpsMapDock = new QDockWidget("GPS map", this);
+    //QDockWidget* gpsMapDock = new QDockWidget("GPS map", this);
 
     gpsMapView = new QQuickWidget;
     gpsMapView->setSource(QUrl(QStringLiteral("qrc:/gps_map.qml")));
     gpsMapView->show();
 
-    gpsMapDock->setWidget(gpsMapView);
-    addDockWidget(Qt::RightDockWidgetArea, gpsMapDock);
+    //gpsMapDock->setWidget(gpsMapView);
+    //addDockWidget(Qt::RightDockWidgetArea, gpsMapDock);
 }
 
 void MainWindow::showAvailablePorts()
@@ -311,16 +313,36 @@ void MainWindow::showAvailablePorts()
 
 void MainWindow::updateRealTimeVisuals()
 {
-    double height = 0;
-    double latitude = 0;
-    double longitude = 0;
-    double temp = 0;
-    double accY = 0;
-    double timeStamp = 0;
-    double altGps = 0;
-    double state = 0;
-    uint16_t packNum = 0;
-    if (currentPort.size()) {
+    if (!currentPort.size())
+        return;
+    double* data = this->serialInterface->getSensorData();
+
+    altitudeRightLbl->setText(QString::number(data[ALTITUDE]));
+    if (data[ALTITUDE] > maxAltitude) {
+        maxAltitude = data[ALTITUDE];
+        maxAltiudeRightLbl->setText(QString::number(maxAltitude));
+    }
+    //velocityRightLbl
+
+    //maxVelocityRightLbl
+
+    accelerationRightLbl->setText(QString::number(data[ACC_Y]));
+
+    gpsMidLbl->setText(QString::number(data[LATITUDE_GPS]));
+    gpsRightLbl->setText(QString::number(data[LONGITUDE_GPS]));
+
+    pitchRightLbl->setText(QString::number(data[PITCH]));
+    rollRightLbl->setText(QString::number(data[ROLL]));
+    yawRightLbl->setText(QString::number(data[YAW]));
+    pitchRateRightLbl->setText(QString::number(data[PITCH]-prevPitch));
+    rollRateRightLbl->setText(QString::number(data[ROLL]-prevRoll));
+    yawRateRightLbl->setText(QString::number(data[YAW]-prevYaw));
+
+    if (data[ALTITUDE] > 0)
+        this->altitudeChart->update(data[ALTITUDE]);
+    this->accelerationChart->update(data[ACC_Y]);
+
+/*
         double* sensorData = this->serialInterface->getSensorData();
         timeStamp = sensorData[TIMESTAMP];
         packNum = this->serialInterface->getPackageNumber();
@@ -332,9 +354,7 @@ void MainWindow::updateRealTimeVisuals()
         temp = sensorData[BME_TEMP];
         accY -= sensorData[ACC_Y];
 
-        if (height > 0)
-            this->altitudeChart->update(height);
-        this->accelerationChart->update(accY);
+
 
         QObject* object = (gpsMapView->rootObject())->findChild<QObject*>("gpsMapItem");
         QVariant latitudeQV = QVariant(latitude);
@@ -344,5 +364,5 @@ void MainWindow::updateRealTimeVisuals()
                                       Q_ARG(QVariant, latitudeQV),
                                       Q_ARG(QVariant, longitudeQV));
         }
-    }
+    */
 }
