@@ -59,12 +59,9 @@ MainWindow::MainWindow(QWidget *parent) :
             qDebug() << "Could not open file";
     textStream = new QTextStream(datafile);
 
-    controlWidget->writeToOutput("Rocket armed & ready for take off.");
+    controlWidget->writeToOutput("Armed & ready for launch.");
 
     connect(controlWidget, &ControlWidget::arm, this, &MainWindow::arm);
-    connect(controlWidget, &ControlWidget::showMap, this, [this] {
-        gpsMapView->show();
-    });
 
     // Set central widget
     setCentralWidget(centralWidget);
@@ -388,7 +385,12 @@ void MainWindow::arm() {
     burnoutStateLight->turnOn();
 
     connect(missionTimer, &QTimer::timeout, this, &MainWindow::updateMissionTime);
-    rocketSound->play();
+
+    disconnect(controlWidget);
+    connect(controlWidget, &ControlWidget::showMap, this, [this] {
+        gpsMapView->show();
+    });
+
 }
 
 void MainWindow::updateMissionTime() {
@@ -459,6 +461,7 @@ void MainWindow::updateStateVisuals(int state) {
             currentState = globals::state::APOGEE;
             break;
         case globals::state::BURNOUT:
+            rocketSound->play();
             controlWidget->writeToOutput(
                         QTime(hours, min, secs, msecs).toString("hh:mm:ss:zzz")
                         + "  Entering motor burnout state.");
