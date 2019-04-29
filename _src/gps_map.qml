@@ -6,7 +6,7 @@ import QtPositioning 5.6
 Item {
     visible: true
     width: 512
-    height: 700
+    height: 512
     Plugin {
         id: mapPlugin
         name: "osm" // "mapboxgl", "esri", ...
@@ -22,21 +22,21 @@ Item {
         anchors.fill: parent
         plugin: mapPlugin
         center: QtPositioning.coordinate(63.418, 10.401951) // Oslo
-        zoomLevel: 14
+        zoomLevel: 17
 
         MapQuickItem {
             id: marker
             objectName: "gpsMapItem"
-            coordinate {latitude: 59.91
-                        longitude: 10.75}
+            coordinate {latitude: 63.418
+                        longitude: 10.401951}
             anchorPoint.x: markerImage.width * 0.5
             anchorPoint.y: markerImage.height
 
             sourceItem: Image {
                 id: markerImage
-                height: 35
-                width: 35
-                source: "qrc:/../_resources/rocket_marker.png"
+                height: 100
+                width: 100
+                source: "qrc:/Sleipner_nobkg.png"
             }
            function updatePosition(latitude, longitude) {
                gpsMap.clearMapItems();

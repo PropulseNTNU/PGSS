@@ -6,5 +6,6 @@
         <file>fonts/titilliumweb/TitilliumWeb-Bold.ttf</file>
         <file>fonts/titilliumweb/TitilliumWeb-Regular.ttf</file>
         <file>fonts/titilliumweb/TitilliumWeb-SemiBold.ttf</file>
+        <file>Sleipner_nobkg.png</file>
     </qresource>
 </RCC>

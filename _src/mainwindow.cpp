@@ -25,14 +25,25 @@
 #include <QQuickItem>
 #include <QTextStream>
 #include <QGridLayout>
+#include <QSound>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent), currentPort(""),
-    maxAltitude(0), prevPitch(0), prevRoll(0),
-    prevYaw(0)
+    maxAltitude(0), maxVelocity(0),
+    prevPitch(0), prevRoll(0),
+    prevYaw(0), armed(false)
 {
     // Create a serial interface
     serialInterface = new SerialInterface(this);
+
+    rocketSound = new QSound("/Users/olebjorn/Documents/Propulse/Developer/PGSS/_src/rocket_sound.wav");
+    windSound = new QSound("/Users/olebjorn/Documents/Propulse/Developer/PGSS/_src/wind_sound.wav");
+    chuteSound = new QSound("/Users/olebjorn/Documents/Propulse/Developer/PGSS/_src/chute.wav");
+    altitudeY = "";
+    acccY = "";
+    velY = "";
+    pitchY = "";
+    currentState = 1;
 
     // Create widgets
     createChartViews();
@@ -41,6 +52,14 @@ MainWindow::MainWindow(QWidget *parent) :
     createStatusBar();
     createDataSection();
     createCentralWidget();
+
+    datafile = new QFile("/Users/olebjorn/Documents/Propulse/Developer/PGSS/_src/data2.txt");
+
+    if (!datafile->open(QIODevice::ReadOnly | QIODevice::Text))
+            qDebug() << "Could not open file";
+    textStream = new QTextStream(datafile);
+
+    controlWidget->writeToOutput("Rocket armed & ready for take off.");
 
     connect(controlWidget, &ControlWidget::arm, this, &MainWindow::arm);
     connect(controlWidget, &ControlWidget::showMap, this, [this] {
@@ -112,6 +131,8 @@ void MainWindow::createStatusBar()
     landedStateLbl = new QLabel("LANDED");
     landedStateLbl->setObjectName("descriptionLabel");
     armedStateLight = new LightWidget(QColor(Qt::green));
+    armedStateLight->turnOn();
+
     burnoutStateLight = new LightWidget(QColor(Qt::green));
     airbrakesStateLight = new LightWidget(QColor(Qt::green));
     apogeeStateLight = new LightWidget(QColor(Qt::green));
@@ -168,7 +189,7 @@ void MainWindow::createDataSection()
     maxVelocityLeftLbL->setObjectName("descriptionLabel");
     maxVelocityRightLbl = new QLabel("000");
     maxVelocityRightLbl->setObjectName("dataLabel");
-    accelerationLeftLbL = new QLabel("Acceleration [m/s^2]");
+    accelerationLeftLbL = new QLabel("Linear acceleration [m/s^2]");
     accelerationLeftLbL->setObjectName("descriptionLabel");
     accelerationRightLbl = new QLabel("000");
     accelerationRightLbl->setObjectName("dataLabel");
@@ -200,27 +221,27 @@ void MainWindow::createDataSection()
     bottomDataLabel->setObjectName("bottomDataLabel");
     pitchLeftLbl = new QLabel("Pitch");
     pitchLeftLbl->setObjectName("descriptionLabel");
-    pitchRightLbl = new QLabel("0000");
+    pitchRightLbl = new QLabel("-");
     pitchRightLbl->setObjectName("dataLabel");
     rollLeftLbl = new QLabel("Roll");
     rollLeftLbl->setObjectName("descriptionLabel");
-    rollRightLbl = new QLabel("0000");
+    rollRightLbl = new QLabel("-");
     rollRightLbl->setObjectName("dataLabel");
     yawLeftLbl = new QLabel("Yaw");
     yawLeftLbl->setObjectName("descriptionLabel");
-    yawRightLbl = new QLabel("0000");
+    yawRightLbl = new QLabel("-");
     yawRightLbl->setObjectName("dataLabel");
     pitchRateLeftLbl = new QLabel("Pitch Rate");
     pitchRateLeftLbl->setObjectName("descriptionLabel");
-    pitchRateRightLbl = new QLabel("0000");
+    pitchRateRightLbl = new QLabel("-");
     pitchRateRightLbl->setObjectName("dataLabel");
     rollRateLeftLbl = new QLabel("Roll Rate");
     rollRateLeftLbl->setObjectName("descriptionLabel");
-    rollRateRightLbl = new QLabel("0000");
+    rollRateRightLbl = new QLabel("-");
     rollRateRightLbl->setObjectName("dataLabel");
     yawRateLeftLbl = new QLabel("Yaw Rate");
     yawRateLeftLbl->setObjectName("descriptionLabel");
-    yawRateRightLbl = new QLabel("0000");
+    yawRateRightLbl = new QLabel("-");
     yawRateRightLbl->setObjectName("dataLabel");
     QGridLayout* bottomDataLayout = new QGridLayout;
     bottomDataLayout->addWidget(pitchLeftLbl, 0, 0, Qt::AlignLeft);
@@ -254,13 +275,13 @@ void MainWindow::createChartViews()
     altitudeChart = new RealTimeChart;
     QSizePolicy sizePolAlt = altitudeChart->sizePolicy();
 
-    accelerationChart = new RealTimeChart;
+    accelerationChart = new RealTimeChart(100, -28);
     QSizePolicy sizePolAccel = altitudeChart->sizePolicy();
 
     altitudeChart->setXAxisTitle("Time [s]");
     altitudeChart->setYAxisTitle("Altitude [m]");
     accelerationChart->setXAxisTitle("Time [s]");
-    accelerationChart->setYAxisTitle("Acceleration [m/s^2]");
+    accelerationChart->setYAxisTitle("Linear acceleration [m/s^2]");
 
     altitudeChartView = new QChartView(altitudeChart, this);
     accelerationChartView = new QChartView(accelerationChart, this);
@@ -319,68 +340,55 @@ void MainWindow::showAvailablePorts()
 
 void MainWindow::updateRealTimeVisuals()
 {
-    if (!currentPort.size())
+    if (!armed)
         return;
-    double* data = this->serialInterface->getSensorData();
 
-    altitudeRightLbl->setText(QString::number(data[ALTITUDE]));
-    if (data[ALTITUDE] > maxAltitude) {
-        maxAltitude = data[ALTITUDE];
-        maxAltiudeRightLbl->setText(QString::number(maxAltitude));
-    }
-    //velocityRightLbl
-    //maxVelocityRightLbl
+    if (textStream->atEnd())
+        return;
+    if (rocketSound->isFinished() && !windSound->isFinished())
+        windSound->play();
+    QString dataString = textStream->readLine();
+    QStringList list = dataString.split(",");
 
-    accelerationRightLbl->setText(QString::number(data[ACC_Y]));
+    double height = list[1].toDouble();
+    if (height > maxAltitude)
+        maxAltitude = height;
+    this->altitudeChart->update(height);
 
-    gpsMidLbl->setText(QString::number(data[LATITUDE_GPS]));
-    gpsRightLbl->setText(QString::number(data[LONGITUDE_GPS]));
+    altitudeY = list[1].left(6);
+    acccY = list[2].left(5);
+    velY = list[3].left(5);
+    double vel = velY.toDouble();
+    if (vel > maxVelocity)
+        maxVelocity = vel;
+    pitchY = list[4].left(6);
 
-    pitchRightLbl->setText(QString::number(data[PITCH]));
+
+    double accY = list[2].toDouble();
+    this->accelerationChart->update(accY);
+
+
+    /*
     rollRightLbl->setText(QString::number(data[ROLL]));
     yawRightLbl->setText(QString::number(data[YAW]));
     pitchRateRightLbl->setText(QString::number(data[PITCH]-prevPitch));
     rollRateRightLbl->setText(QString::number(data[ROLL]-prevRoll));
-    yawRateRightLbl->setText(QString::number(data[YAW]-prevYaw));
+    yawRateRightLbl->setText(QString::number(data[YAW]-prevYaw)); */
 
-    if (data[ALTITUDE] > 0)
-        this->altitudeChart->update(data[ALTITUDE]);
-    this->accelerationChart->update(data[ACC_Y]);
-    updateStateVisuals(data[STATE]);
-
-/*
-        double* sensorData = this->serialInterface->getSensorData();
-        timeStamp = sensorData[TIMESTAMP];
-        packNum = this->serialInterface->getPackageNumber();
-        height = sensorData[ALTITUDE];
-        altGps = sensorData[ALTITUDE_GPS];
-        state = sensorData[STATE];
-        latitude = sensorData[LATITUDE_GPS];
-        longitude = sensorData[LONGITUDE_GPS];
-        temp = sensorData[BME_TEMP];
-        accY -= sensorData[ACC_Y];
-
-
-
-        QObject* object = (gpsMapView->rootObject())->findChild<QObject*>("gpsMapItem");
-        QVariant latitudeQV = QVariant(latitude);
-        QVariant longitudeQV = QVariant(longitude);
-        if (object != NULL) {
-            QMetaObject::invokeMethod(object, "updatePosition",
-                                      Q_ARG(QVariant, latitudeQV),
-                                      Q_ARG(QVariant, longitudeQV));
-        }
-    */
+    //updateStateVisuals(data[STATE]);
 }
 
 void MainWindow::arm() {
+    armed = true;
     missionTimer = new QTimer;
     missionTimer->setInterval(100);
     armedStateLight->turnOn();
     missionTimer->start();
-    connect(missionTimer, &QTimer::timeout, this, &MainWindow::updateMissionTime);
 
-    controlWidget->writeToOutput("Rocket armed & ready for take off.");
+    burnoutStateLight->turnOn();
+
+    connect(missionTimer, &QTimer::timeout, this, &MainWindow::updateMissionTime);
+    rocketSound->play();
 }
 
 void MainWindow::updateMissionTime() {
@@ -398,39 +406,79 @@ void MainWindow::updateMissionTime() {
         min -= 60;
     }
     timeLbl->setText(QTime(hours, min, secs, msecs).toString("hh:mm:ss:zzz"));
+
+    altitudeRightLbl->setText(altitudeY);
+    maxAltiudeRightLbl->setText(QString::number(maxAltitude));
+
+    accelerationRightLbl->setText(acccY);
+    velocityRightLbl->setText(velY);
+    maxVelocityRightLbl->setText(QString::number(maxVelocity));
+    pitchRightLbl->setText(pitchY);
+    // STATES 0-7 sec BURNOUT, 7-23 sec AIRBRAKES, APOGEE 23-30, CHUTE
+    if (secs >= 0 && secs < 7)
+        updateStateVisuals(globals::state::BURNOUT);
+    else if (secs >= 7 && secs < 23)
+        updateStateVisuals(globals::state::AIRBRAKES);
+    else if (secs >= 23 &&  secs < 30)
+        updateStateVisuals(globals::state::APOGEE);
+    else if (secs >= 30 && secs <= 35) {
+        updateStateVisuals(globals::state::CHUTE);
+        double height = altitudeY.toDouble()-61.1;
+        altitudeY = QString::number(height);
+        altitudeRightLbl->setText(altitudeY);
+        this->altitudeChart->update(height);
+        accelerationChart->update(0);
+    }
+    else {
+        updateStateVisuals(globals::state::LANDED);
+        altitudeChart->update(0);
+        accelerationChart->update(0);
+        altitudeRightLbl->setText("0000");
+
+        missionTimer->stop();
+    }
+
 }
 
 void MainWindow::updateStateVisuals(int state) {
+    if (state == currentState)
+        return;
     switch (state) {
         case globals::state::AIRBRAKES:
             airbrakesStateLight->turnOn();
             controlWidget->writeToOutput(
                         QTime(hours, min, secs, msecs).toString("hh:mm:ss:zzz")
                         + "  Entering airbrakes state.");
+            currentState = globals::state::AIRBRAKES;
             break;
         case globals::state::APOGEE:
             controlWidget->writeToOutput(
                     QTime(hours, min, secs, msecs).toString("hh:mm:ss:zzz")
-                    + "  Reached apogee.");
+                    + "  Apogee reached at " + QString::number(maxAltitude) + " meters.");
             apogeeStateLight->turnOn();
+            currentState = globals::state::APOGEE;
             break;
         case globals::state::BURNOUT:
             controlWidget->writeToOutput(
                         QTime(hours, min, secs, msecs).toString("hh:mm:ss:zzz")
-                        + "  Motor burnout reached.");
+                        + "  Entering motor burnout state.");
             burnoutStateLight->turnOn();
+            currentState = globals::state::BURNOUT;
             break;
         case globals::state::CHUTE:
+            chuteSound->play();
             controlWidget->writeToOutput(
                     QTime(hours, min, secs, msecs).toString("hh:mm:ss:zzz")
                     + "  Main chute deployed.");
-            burnoutStateLight->turnOn();
+            chuteStateLight->turnOn();
+            currentState = globals::state::CHUTE;
             break;
         case globals::state::LANDED:
             controlWidget->writeToOutput(
                         QTime(hours, min, secs, msecs).toString("hh:mm:ss:zzz")
                         + "  The rocket has landed, press \"Show location\" to show location on map.");
             landedStateLight->turnOn();
+            currentState = globals::state::LANDED;
             controlWidget->showMapBtn();
             break;
     }

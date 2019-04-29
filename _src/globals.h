@@ -4,12 +4,12 @@
 #include <QString>
 
 namespace globals {
-    const int CHART_YRANGE = 500;
-    const int CHART_XRANGE = 10;
+    const int CHART_YRANGE = 3200;
+    const int CHART_XRANGE = 38;
     const int CHART_WIN_MIN_WIDTH = 400;
     const int CHART_WIN_MIN_HEIGHT = 300;
 
-    const int TIMER_UPDATE = 100;
+    const int TIMER_UPDATE = 30;
 
     const int NUM_FLAGS = 10;
     const int NUM_SENSORS = 5;

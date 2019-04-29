@@ -4,9 +4,10 @@
 #include <QtCharts/QSplineSeries>
 #include <QtCharts/QValueAxis>
 
-RealTimeChart::RealTimeChart(QGraphicsItem* parent, Qt::WindowFlags wFlags) :
+RealTimeChart::RealTimeChart(int yRange, int yRangeNeg, QGraphicsItem* parent, Qt::WindowFlags wFlags) :
     QChart(QChart::ChartTypeCartesian, parent, wFlags), x(0), y(0),
-    yRange(globals::CHART_YRANGE), xAxisTitle(""), yAxisTitle(""),
+    yRange(yRange), yRangeNeg(yRangeNeg),
+    xAxisTitle(""), yAxisTitle(""),
     color(Qt::red), width(1) {
 
     // Create new series
@@ -32,9 +33,13 @@ void RealTimeChart::update(double y) {
 
     series->append(x, y);
     if (y > yRange) {
-       // yRange = y;
-        axisY()->setRange(0, yRange);
+        yRange = y;
+        axisY()->setRange(yRangeNeg, yRange);
     }
+   /* if (y < yRangeNeg) {
+        yRangeNeg = y;
+        axisY()->setRange(yRangeNeg, yRange);
+    }*/
 }
 
 void RealTimeChart::newSeries() {
@@ -49,10 +54,9 @@ void RealTimeChart::newSeries() {
     addSeries(series);
     createDefaultAxes();
     setAxisX(axis, series);
-    axis->setTickCount(globals::CHART_XRANGE);
 
     axisX()->setRange(0, globals::CHART_XRANGE);
-    axisY()->setRange(0, yRange);
+    axisY()->setRange(yRangeNeg, yRange);
     axisX()->setTitleText(xAxisTitle);
     axisY()->setTitleText(yAxisTitle);
 }

@@ -74,7 +74,7 @@ void ControlWidget::createLeftSide()
     QVBoxLayout* leftSideBoxLayout = new QVBoxLayout;
     leftSideBoxLayout->addWidget(leftFirstLineContainer);
     leftSideBoxLayout->addWidget(leftSecondLineContainer);
-    button = new QPushButton("Arm");
+    button = new QPushButton("Launch");
     button->setObjectName("Set");
     connect(button, &QPushButton::clicked, this, [this] {
         disconnect(button);

@@ -24,6 +24,8 @@ class QPixmap;
 class QLabel;
 class QQuickWidget;
 class QListWidget;
+class QTextStream;
+class QSound;
 
 class MainWindow : public QMainWindow
 {
@@ -133,10 +135,24 @@ private:
     QString currentPort;
     QTimer* timer;
     ControlWidget* test;
+
     double maxAltitude;
+    double maxVelocity;
     double prevPitch;
     double prevRoll;
     double prevYaw;
+
+    QSound* rocketSound;
+    QSound* windSound;
+    QSound* chuteSound;
+    QFile* datafile;
+    QTextStream* textStream;
+    bool armed;
+    QString altitudeY;
+    QString acccY;
+    QString velY;
+    QString pitchY;
+    int currentState;
 };
 
 #endif // MAINWINDOW_H

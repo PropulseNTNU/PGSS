@@ -8,7 +8,7 @@
 
 QT       += widgets core gui charts serialport \
             3dcore 3drender 3dinput 3dextras \
-            quickwidgets location
+            quickwidgets location multimedia
 
 TARGET = PGSS
 TEMPLATE = app
@@ -42,7 +42,8 @@ RESOURCES += \
     navball.qrc \
     qml.qrc \
     img.qrc \
-    styling.qrc
+    styling.qrc \
+    demo.qrc
 
 
 win32:RC_ICNS = propulse_logo_icon.ico
