@@ -65,7 +65,7 @@ private:
     LightWidget* apogeeStateLight;
     LightWidget* chuteStateLight;
     LightWidget* landedStateLight;
-    void updateStateVisuals(int state);
+
 
     void createDataSection();
     QWidget* dataSectionContainer;
@@ -121,13 +121,6 @@ private:
     QWidget* gpsMapWidget;
 
     ControlWidget* controlWidget;
-    QTimer* missionTimer;
-    int msecs;
-    int secs;
-    int min;
-    int hours;
-    void updateMissionTime();
-    void arm();
 
     SerialInterface* serialInterface;
     QString currentPort;

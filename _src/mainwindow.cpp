@@ -42,10 +42,11 @@ MainWindow::MainWindow(QWidget *parent) :
     createDataSection();
     createCentralWidget();
 
-    connect(controlWidget, &ControlWidget::arm, this, &MainWindow::arm);
-    connect(controlWidget, &ControlWidget::showMap, this, [this] {
-        gpsMapView->show();
-    });
+    // Setup timer for updating real time plot
+    timer = new QTimer;
+    timer->setInterval(globals::TIMER_UPDATE);
+    timer->start();
+    connect(timer, &QTimer::timeout, this, &MainWindow::updateRealTimeVisuals);
 
     // Set central widget
     setCentralWidget(centralWidget);
@@ -267,12 +268,6 @@ void MainWindow::createChartViews()
 
     altitudeChartView->setRenderHint(QPainter::Antialiasing);
 
-    // Setup timer for updating real time plot
-    timer = new QTimer;
-    timer->setInterval(globals::TIMER_UPDATE);
-    timer->start();
-    connect(timer, &QTimer::timeout, this, &MainWindow::updateRealTimeVisuals);
-
     QHBoxLayout* chartLayout = new QHBoxLayout;
     chartLayout->addWidget(altitudeChartView);
     chartLayout->addWidget(accelerationChartView);
@@ -317,7 +312,8 @@ void MainWindow::showAvailablePorts()
         QAction* portAction = this->deviceMenu->addAction(port);
         connect(portAction, &QAction::triggered, [this, portAction] {
            currentPort = portAction->text();
-           serialInterface->setupPort(currentPort, globals::SERIAL_BAUD_RATE);
+           if (serialInterface->setupPort(currentPort, globals::SERIAL_BAUD_RATE))
+               controlWidget->writeToOutput("Device successfully set up.");
         });
     }
 }
@@ -327,7 +323,7 @@ void MainWindow::updateRealTimeVisuals()
     if (!currentPort.size())
         return;
     double* data = this->serialInterface->getSensorData();
-
+    //qDebug() << data[ALTITUDE];
     altitudeRightLbl->setText(QString::number(data[ALTITUDE]));
     if (data[ALTITUDE] > maxAltitude) {
         maxAltitude = data[ALTITUDE];
@@ -349,7 +345,7 @@ void MainWindow::updateRealTimeVisuals()
     if (data[ALTITUDE] > 0)
         this->altitudeChart->update(data[ALTITUDE]);
     this->accelerationChart->update(data[ACC_Y]);
-    updateStateVisuals(data[STATE]);
+
 
 /*
         double* sensorData = this->serialInterface->getSensorData();
@@ -376,65 +372,3 @@ void MainWindow::updateRealTimeVisuals()
     */
 }
 
-void MainWindow::arm() {
-    missionTimer = new QTimer;
-    missionTimer->setInterval(100);
-    armedStateLight->turnOn();
-    missionTimer->start();
-    connect(missionTimer, &QTimer::timeout, this, &MainWindow::updateMissionTime);
-
-    controlWidget->writeToOutput("Rocket armed & ready for take off.");
-}
-
-void MainWindow::updateMissionTime() {
-    msecs += 100;
-    if (msecs >= 1000) {
-        secs += 1;
-        msecs -= 1000;
-    }
-    if (secs >= 60) {
-        min += 1;
-        secs -= 60;
-    }
-    if (min >= 60) {
-        hours += 1;
-        min -= 60;
-    }
-    timeLbl->setText(QTime(hours, min, secs, msecs).toString("hh:mm:ss:zzz"));
-}
-
-void MainWindow::updateStateVisuals(int state) {
-    switch (state) {
-        case globals::state::AIRBRAKES:
-            airbrakesStateLight->turnOn();
-            controlWidget->writeToOutput(
-                        QTime(hours, min, secs, msecs).toString("hh:mm:ss:zzz")
-                        + "  Entering airbrakes state.");
-            break;
-        case globals::state::APOGEE:
-            controlWidget->writeToOutput(
-                    QTime(hours, min, secs, msecs).toString("hh:mm:ss:zzz")
-                    + "  Reached apogee.");
-            apogeeStateLight->turnOn();
-            break;
-        case globals::state::BURNOUT:
-            controlWidget->writeToOutput(
-                        QTime(hours, min, secs, msecs).toString("hh:mm:ss:zzz")
-                        + "  Motor burnout reached.");
-            burnoutStateLight->turnOn();
-            break;
-        case globals::state::CHUTE:
-            controlWidget->writeToOutput(
-                    QTime(hours, min, secs, msecs).toString("hh:mm:ss:zzz")
-                    + "  Main chute deployed.");
-            burnoutStateLight->turnOn();
-            break;
-        case globals::state::LANDED:
-            controlWidget->writeToOutput(
-                        QTime(hours, min, secs, msecs).toString("hh:mm:ss:zzz")
-                        + "  The rocket has landed, press \"Show location\" to show location on map.");
-            landedStateLight->turnOn();
-            controlWidget->showMapBtn();
-            break;
-    }
-}
