@@ -18,11 +18,10 @@ enum sensorData { TIMESTAMP, BME_TEMP, IMU_TEMP,
 };
 
 enum sensorDataBle { TIME, TROLL, TPITCH, TYAW,
-                     TACCELERATION_X, TACCELERATION_Y, TACCELERATION_Z,
-                     TCOMPASS_X, TCOMPASS_Y, TCOMPASS_Z ,
-                     TEMPERATURES , THUMIDITY, TALTITUDE, NUM_SENSORS
-};
-
+                TACCELERATION_X, TACCELERATION_Y, TACCELERATION_Z,
+                TCOMPASS_X, TCOMPASS_Y, TCOMPASS_Z ,
+                TEMPERATURES , THUMIDITY, TALTITUDE, TPRESSURE, TGAS, TEMP_ACCUR_SENS,
+                NUMBER_OF_SENSORS};
 /*
  * Read last data package from buffer to flags[], sensors[] and package_number.
  * Return index of package start byte '<' in buffer

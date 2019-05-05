@@ -313,8 +313,13 @@ void MainWindow::showAvailablePorts()
 {
     this->deviceMenu->clear();
     QStringList ports = this->serialInterface->getAvailableDevices();
-    for (auto& port : ports)
+    for (auto& port : ports) {
         QAction* portAction = this->deviceMenu->addAction(port);
+        connect(portAction, &QAction::triggered, [this, portAction] {
+           currentPort = portAction->text();
+           serialInterface->setupPort(currentPort, globals::SERIAL_BAUD_RATE);
+        });
+    }
 }
 
 void MainWindow::updateRealTimeVisuals()
@@ -328,8 +333,6 @@ void MainWindow::updateRealTimeVisuals()
         maxAltitude = data[ALTITUDE];
         maxAltiudeRightLbl->setText(QString::number(maxAltitude));
     }
-    //velocityRightLbl
-    //maxVelocityRightLbl
 
     accelerationRightLbl->setText(QString::number(data[ACC_Y]));
 
