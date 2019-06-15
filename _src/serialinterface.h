@@ -9,20 +9,24 @@
 
 class QSerialPort;
 
-class SerialInterface : public QObject {
-signals:
-    void deviceChanged(QString /* Device Name */);
+class SerialInterface : public QObject
+{
+    Q_OBJECT
 public:
-    SerialInterface(QObject* parent = 0);
+    SerialInterface(QObject* parent = nullptr);
     ~SerialInterface();
     QStringList getAvailableDevices(); // List all available devices
     bool setupPort(QString portName, qint32 baudRate); // Setup port with given baud rate
     bool setBaudRate(qint32 baudRate);
     qint32 getBaudRate();
-    double* getSensorData();
+    float* getSensorData();
     void setFileName(QString filename);
     void setFilePath(QString filePath);
     uint16_t getPackageNumber();
+
+signals:
+      void deviceChanged(QString deviceName);
+      void errorMessage(QString message);
 
 private:
     void readSerial(); // Called when device sends readyRead
@@ -31,7 +35,7 @@ private:
     QMap<QString, qint32> deviceBaudRate; // Port name as key, baud rate as value
     QByteArray buffer; // Serial buffer
 
-    double* sensorData; // Stores data that
+    float* sensorData; // Stores data that
     uint16_t packageNumber; // Stores current package number
 
     QFile *dataFile; // File object for storing all incoming raw data

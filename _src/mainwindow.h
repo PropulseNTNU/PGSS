@@ -120,6 +120,7 @@ private:
     QQuickWidget* gpsMapView;
     QWidget* gpsMapWidget;
 
+    void createControlWidget();
     ControlWidget* controlWidget;
 
     SerialInterface* serialInterface;

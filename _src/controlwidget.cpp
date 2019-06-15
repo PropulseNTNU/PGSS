@@ -24,22 +24,13 @@ ControlWidget::ControlWidget(QWidget *parent) : QWidget(parent),
     sizePolicy.setHorizontalStretch(5);
     outputList->setSizePolicy(sizePolicy);
 
-    /*
-    spacerLine = new QFrame;
-    spacerLine->setFrameShape(QFrame::HLine);
-    spacerLine->setFrameShadow(QFrame::Sunken);
-    spacerLine->setObjectName("spacerLine");
-    */
-
     QGridLayout* gridLayout = new QGridLayout;
     gridLayout->addWidget(leftSideBox, 0, 0, 0, 1);
     gridLayout->addWidget(outputList, 0, 1, 0, 5);
     gridLayout->addWidget(rightSideBox, 0, 6, 0, 1);
 
     QVBoxLayout* centralLayout = new QVBoxLayout;
-    // centralLayout->addWidget(spacerLine);
     centralLayout->addLayout(gridLayout);
-
     setLayout(centralLayout);
 }
 
@@ -74,14 +65,7 @@ void ControlWidget::createLeftSide()
     QVBoxLayout* leftSideBoxLayout = new QVBoxLayout;
     leftSideBoxLayout->addWidget(leftFirstLineContainer);
     leftSideBoxLayout->addWidget(leftSecondLineContainer);
-    button = new QPushButton("Arm");
-    button->setObjectName("Set");
-    connect(button, &QPushButton::clicked, this, [this] {
-        disconnect(button);
-        emit this->arm();
-    });
-    leftSideBoxLayout->addWidget(button);
-   // leftSideBoxLayout->setSpacing(0);
+
     leftSideBox->setLayout(leftSideBoxLayout);
 }
 
@@ -113,6 +97,9 @@ void ControlWidget::createRightSide()
     filenameLEdit = new QLineEdit(dataFilename);
     filenameBtn = new QPushButton("Set");
     filenameBtn->setObjectName("Set");
+    connect(filenameBtn, &QPushButton::clicked, [this] {
+        emit this->filenameChanged(this->dataPath+this->dataFilename);
+    });
     QHBoxLayout* rightSecondLineContainerLayout = new QHBoxLayout;
     rightSecondLineContainerLayout->addWidget(filenameLbl);
     rightSecondLineContainerLayout->addWidget(filenameLEdit);
@@ -124,7 +111,6 @@ void ControlWidget::createRightSide()
     rightSideBoxLayout->addWidget(topRightLbl);
     rightSideBoxLayout->addWidget(rightFirstLineContainer);
     rightSideBoxLayout->addWidget(rightSecondLineContainer);
-  //  rightSideBoxLayout->setSpacing(0);
     rightSideBox->setLayout(rightSideBoxLayout);
 }
 
@@ -141,12 +127,4 @@ void ControlWidget::writeToOutput(QString message)
 void ControlWidget::setDeviceName(QString deviceName)
 {
     deviceNameLbl->setText(deviceName);
-}
-
-void ControlWidget::showMapBtn() {
-    button->setText("Show location");
-    connect(button, &QPushButton::clicked, this, [this] {
-        emit this->showMap();
-    });
-    button->show();
 }

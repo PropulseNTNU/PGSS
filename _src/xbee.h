@@ -5,6 +5,7 @@
 
 /* Sensor data enum has to match the one defined on the
    flight computer. */
+
 enum sensorData { TIMESTAMP, BME_TEMP, IMU_TEMP,
                   PRESSURE, ALTITUDE,
                   ACC_X, ACC_Y, ACC_Z,
@@ -15,7 +16,7 @@ enum sensorData { TIMESTAMP, BME_TEMP, IMU_TEMP,
                   LINEAR_ACCEL_X,LINEAR_ACCEL_Y,LINEAR_ACCEL_Z,
                   QUATERNION_X, QUATERNION_Y, QUATERNION_Z, QUATERNION_W,
                   STATE, ALTITUDE_GPS, LONGITUDE_GPS, LATITUDE_GPS, NUM_TYPES
-};
+              };
 
 enum sensorDataBle { TIME, TROLL, TPITCH, TYAW,
                 TACCELERATION_X, TACCELERATION_Y, TACCELERATION_Z,

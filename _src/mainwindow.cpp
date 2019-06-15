@@ -40,6 +40,7 @@ MainWindow::MainWindow(QWidget *parent) :
     createGPSMap();
     createStatusBar();
     createDataSection();
+    createControlWidget();
     createCentralWidget();
 
     // Setup timer for updating real time plot
@@ -61,8 +62,6 @@ void MainWindow::createCentralWidget()
 {
     centralWidget = new QWidget;
     centralWidget->setObjectName("centralWidget");
-    controlWidget = new ControlWidget;
-
     QGridLayout* centralLayout = new QGridLayout;
     centralLayout->addWidget(statusBarContainer, 0, 0, 1, 10,  Qt::AlignLeft);
     centralLayout->addWidget(dataSectionContainer, 1, 0, 3, 4,  Qt::AlignLeft);
@@ -304,6 +303,21 @@ void MainWindow::createGPSMap()
     //addDockWidget(Qt::RightDockWidgetArea, gpsMapDock);
 }
 
+void MainWindow::createControlWidget()
+{
+    controlWidget = new ControlWidget;
+    connect(controlWidget, &ControlWidget::baudRateChanged, [this] (qint32 baudRate) {
+                this->serialInterface->setBaudRate(baudRate);
+            });
+    connect(controlWidget, &ControlWidget::filenameChanged, [this] (QString filename) {
+       this->serialInterface->setFileName(filename);
+    });
+    connect(serialInterface, &SerialInterface::deviceChanged, [this] (QString deviceName) {
+        this->controlWidget->setDeviceName(deviceName);
+    });
+
+}
+
 void MainWindow::showAvailablePorts()
 {
     this->deviceMenu->clear();
@@ -314,6 +328,8 @@ void MainWindow::showAvailablePorts()
            currentPort = portAction->text();
            if (serialInterface->setupPort(currentPort, globals::SERIAL_BAUD_RATE))
                controlWidget->writeToOutput("Device successfully set up.");
+           else
+               controlWidget->writeToOutput("Could not set up device.");
         });
     }
 }
@@ -322,7 +338,7 @@ void MainWindow::updateRealTimeVisuals()
 {
     if (!currentPort.size())
         return;
-    double* data = this->serialInterface->getSensorData();
+    float* data = this->serialInterface->getSensorData();
     //qDebug() << data[ALTITUDE];
     altitudeRightLbl->setText(QString::number(data[ALTITUDE]));
     if (data[ALTITUDE] > maxAltitude) {
@@ -348,7 +364,7 @@ void MainWindow::updateRealTimeVisuals()
 
 
 /*
-        double* sensorData = this->serialInterface->getSensorData();
+        float* sensorData = this->serialInterface->getSensorData();
         timeStamp = sensorData[TIMESTAMP];
         packNum = this->serialInterface->getPackageNumber();
         height = sensorData[ALTITUDE];
