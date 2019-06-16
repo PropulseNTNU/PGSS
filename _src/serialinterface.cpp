@@ -15,7 +15,7 @@ SerialInterface::SerialInterface(QObject* parent) : QObject(parent),
              globals::DEFAULT_DATA_FILENAME),
     packageNumber(0)
 {
-    sensorData = new float[NUM_TYPES] {};
+    sensorData = new float[NUM_TYPES+NUMBER_OF_SENSORS] {};
     serialDevice = nullptr;
     dataFile = new QFile(filename);
     if (!dataFile->open(QIODevice::ReadWrite))
@@ -115,7 +115,7 @@ void SerialInterface::readSerial()
     if (buffer.size() > globals::SERIAL_BUFFER_SIZE)
         buffer.clear();
     read_buffer(buffer, (uint8_t*)sensorData,
-                (NUM_TYPES)*sizeof(float), &packageNumber);
+                (NUM_TYPES+NUMBER_OF_SENSORS)*sizeof(float), &packageNumber);
 }
 
 bool SerialInterface::setBaudRate(qint32 baudRate)
