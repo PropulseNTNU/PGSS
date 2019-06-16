@@ -4,10 +4,16 @@
 #include <QString>
 
 namespace globals {
-    const int CHART_YRANGE = 500;
+    const int CHART_YRANGE_POSITIVE = 500;
+    const int CHART_YRANGE_NEGATIVE = -500;
     const int CHART_XRANGE = 10;
     const int CHART_WIN_MIN_WIDTH = 400;
     const int CHART_WIN_MIN_HEIGHT = 300;
+    const int CHART_YRANGE_STEPFACTOR = 50;
+
+    const int ALTITUDE_CHART_YRANGE = 1;
+    const int ACCELERATION_CHAR_YRANGE_POSITIVE = 10;
+    const int ACCELERATION_CHAR_YRANGE_NEGATIVE = -10;
 
     const int TIMER_UPDATE = 100;
 

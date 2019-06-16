@@ -1,8 +1,10 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QtCharts/QChartView>
 #include <QMainWindow>
+
+#include "globals.h"
+#include <QtCharts/QChartView>
 #include <QVector>
 #include <QFile>
 
@@ -36,6 +38,7 @@ public:
 public slots:
      void showAvailablePorts();
      void updateRealTimeVisuals();
+     void resetVisuals();
 
 private:
     void createCentralWidget();
@@ -57,15 +60,17 @@ private:
     QLabel* burnoutStateLbl;
     QLabel* airbrakesStateLbl;
     QLabel* apogeeStateLbl;
+    QLabel* drogueStateLbl;
     QLabel* chuteStateLbl;
     QLabel* landedStateLbl;
     LightWidget* armedStateLight;
     LightWidget* burnoutStateLight;
     LightWidget* airbrakesStateLight;
     LightWidget* apogeeStateLight;
+    LightWidget* drogueStateLight;
     LightWidget* chuteStateLight;
     LightWidget* landedStateLight;
-
+    void updateStateVisual(globals::state state);
 
     void createDataSection();
     QWidget* dataSectionContainer;
@@ -112,6 +117,8 @@ private:
     QMenuBar* menuBar;
     QMenu* addMenu;
     QMenu* deviceMenu;
+    QMenu* settingsMenu;
+    QMenu* viewMenu;
 
     void createNavball();
     NavballWidget* navballWidget;

@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include "globals.h"
 #include "realtimechart.h"
 #include "serialinterface.h"
 #include "xbee.h"
@@ -108,7 +107,9 @@ void MainWindow::createStatusBar()
     airbrakesStateLbl->setObjectName("descriptionLabel");
     apogeeStateLbl = new QLabel("APOGEE");
     apogeeStateLbl->setObjectName("descriptionLabel");
-    chuteStateLbl = new QLabel("CHUTE");
+    drogueStateLbl = new QLabel("DROGUE");
+    drogueStateLbl->setObjectName("descriptionLabel");
+    chuteStateLbl = new QLabel("MAIN");
     chuteStateLbl->setObjectName("descriptionLabel");
     landedStateLbl = new QLabel("LANDED");
     landedStateLbl->setObjectName("descriptionLabel");
@@ -117,6 +118,7 @@ void MainWindow::createStatusBar()
     burnoutStateLight = new LightWidget(QColor(Qt::green));
     airbrakesStateLight = new LightWidget(QColor(Qt::green));
     apogeeStateLight = new LightWidget(QColor(Qt::green));
+    drogueStateLight = new LightWidget(QColor(Qt::green));
     chuteStateLight = new LightWidget(QColor(Qt::green));
     landedStateLight = new LightWidget(QColor(Qt::green));
     QGridLayout* statusRightGridLayout = new QGridLayout;
@@ -124,14 +126,16 @@ void MainWindow::createStatusBar()
     statusRightGridLayout->addWidget(burnoutStateLight, 0, 1, Qt::AlignCenter);
     statusRightGridLayout->addWidget(airbrakesStateLight, 0, 2, Qt::AlignCenter);
     statusRightGridLayout->addWidget(apogeeStateLight, 0, 3, Qt::AlignCenter);
-    statusRightGridLayout->addWidget(chuteStateLight, 0, 4, Qt::AlignCenter);
-    statusRightGridLayout->addWidget(landedStateLight, 0, 5, Qt::AlignCenter);
+    statusRightGridLayout->addWidget(drogueStateLight, 0, 4, Qt::AlignCenter);
+    statusRightGridLayout->addWidget(chuteStateLight, 0, 5, Qt::AlignCenter);
+    statusRightGridLayout->addWidget(landedStateLight, 0, 6, Qt::AlignCenter);
     statusRightGridLayout->addWidget(armedStateLbl, 1, 0, Qt::AlignCenter);
     statusRightGridLayout->addWidget(burnoutStateLbl, 1, 1, Qt::AlignCenter);
     statusRightGridLayout->addWidget(airbrakesStateLbl, 1, 2, Qt::AlignCenter);
     statusRightGridLayout->addWidget(apogeeStateLbl, 1, 3, Qt::AlignCenter);
-    statusRightGridLayout->addWidget(chuteStateLbl, 1, 4, Qt::AlignCenter);
-    statusRightGridLayout->addWidget(landedStateLbl, 1, 5, Qt::AlignCenter);
+    statusRightGridLayout->addWidget(drogueStateLbl, 1, 4, Qt::AlignCenter);
+    statusRightGridLayout->addWidget(chuteStateLbl, 1, 5, Qt::AlignCenter);
+    statusRightGridLayout->addWidget(landedStateLbl, 1, 6, Qt::AlignCenter);
 
     QVBoxLayout* statusRightLayout = new QVBoxLayout;
     statusRightLayout->addLayout(statusRightGridLayout);
@@ -176,9 +180,9 @@ void MainWindow::createDataSection()
     accelerationRightLbl->setObjectName("dataLabel");
     gpsLeftLbl = new QLabel("GPS Location (lat,long)");
     gpsLeftLbl->setObjectName("descriptionLabel");
-    gpsMidLbl = new QLabel("63.418");
+    gpsMidLbl = new QLabel("00");
     gpsMidLbl->setObjectName("dataLabel");
-    gpsRightLbl = new QLabel("10.402");
+    gpsRightLbl = new QLabel("00");
     gpsRightLbl->setObjectName("dataLabel");
     QGridLayout* topDataLayout = new QGridLayout;
     topDataLayout->addWidget(topDataLabel, 0, 0, Qt::AlignLeft);
@@ -254,9 +258,15 @@ void MainWindow::createChartViews()
 
     // Setup chart and add to chartView
     altitudeChart = new RealTimeChart;
+    altitudeChart->setYAxisRange(0,
+                                 globals::ALTITUDE_CHART_YRANGE);
     QSizePolicy sizePolAlt = altitudeChart->sizePolicy();
 
     accelerationChart = new RealTimeChart;
+    accelerationChart->setYAxisRange(
+                globals::ACCELERATION_CHAR_YRANGE_NEGATIVE,
+                globals::ACCELERATION_CHAR_YRANGE_POSITIVE
+                );
     QSizePolicy sizePolAccel = altitudeChart->sizePolicy();
 
     altitudeChart->setXAxisTitle("Time [s]");
@@ -283,6 +293,22 @@ void MainWindow::createMenuBar()
     deviceMenu = addMenu->addMenu(tr("Device"));
     connect(deviceMenu, &QMenu::aboutToShow, this, &MainWindow::showAvailablePorts);
 
+    settingsMenu = menuBar->addMenu(tr("&Settings"));
+    QAction* resetAction = settingsMenu->addAction(tr("&Reset visuals"));
+    connect(resetAction, &QAction::triggered, this, &MainWindow::resetVisuals);
+    settingsMenu->addSeparator();
+    QAction* startUpdatingVisualsAction = settingsMenu->addAction(tr("&Start visuals"));
+    connect(startUpdatingVisualsAction, &QAction::triggered, [this] {
+       this->timer->start();
+    });
+    QAction* stopUpdatingVisualsAction = settingsMenu->addAction(tr("&Pause visuals"));
+    connect(stopUpdatingVisualsAction, &QAction::triggered, [this] {
+       this->timer->stop();
+    });
+
+    viewMenu = menuBar->addMenu(tr("&View"));
+
+
     setMenuBar(menuBar);
 }
 
@@ -296,13 +322,8 @@ void MainWindow::createNavball()
 
 void MainWindow::createGPSMap()
 {
-    //QDockWidget* gpsMapDock = new QDockWidget("GPS map", this);
-
     gpsMapView = new QQuickWidget;
     gpsMapView->setSource(QUrl(QStringLiteral("qrc:/gps_map.qml"))); 
-
-    //gpsMapDock->setWidget(gpsMapView);
-    //addDockWidget(Qt::RightDockWidgetArea, gpsMapDock);
 }
 
 void MainWindow::createControlWidget()
@@ -345,51 +366,79 @@ void MainWindow::updateRealTimeVisuals()
         return;
     float* data = this->serialInterface->getSensorData();
 
-    altitudeRightLbl->setText(QString::number(data[ALTITUDE]));
+    updateStateVisual((globals::state) data[STATE]);
+
+
     if (data[ALTITUDE] > maxAltitude) {
         maxAltitude = data[ALTITUDE];
-        maxAltiudeRightLbl->setText(QString::number(maxAltitude));
+        maxAltiudeRightLbl->setText(QString::number(maxAltitude, 'f', 1));
     }
 
-    accelerationRightLbl->setText(QString::number(data[ACC_Y]));
-
-    gpsMidLbl->setText(QString::number(data[LATITUDE_GPS]));
-    gpsRightLbl->setText(QString::number(data[LONGITUDE_GPS]));
-
-    pitchRightLbl->setText(QString::number(data[PITCH]));
-    rollRightLbl->setText(QString::number(data[ROLL]));
-    yawRightLbl->setText(QString::number(data[YAW]));
-    pitchRateRightLbl->setText(QString::number(data[PITCH]-prevPitch));
-    rollRateRightLbl->setText(QString::number(data[ROLL]-prevRoll));
-    yawRateRightLbl->setText(QString::number(data[YAW]-prevYaw));
+    altitudeRightLbl->setText(QString::number(data[ALTITUDE], 'f', 1));
+    accelerationRightLbl->setText(QString::number(data[ACC_Y], 'f', 1));
+    gpsMidLbl->setText(QString::number(data[LATITUDE_GPS], 'f', 3));
+    gpsRightLbl->setText(QString::number(data[LONGITUDE_GPS], 'f', 3));
+    pitchRightLbl->setText(QString::number(data[PITCH], 'f', 1));
+    rollRightLbl->setText(QString::number(data[ROLL])), 'f', 1;
+    yawRightLbl->setText(QString::number(data[YAW],'f', 1));
+    pitchRateRightLbl->setText(QString::number(data[PITCH]-prevPitch, 'f', 1));
+    rollRateRightLbl->setText(QString::number(data[ROLL]-prevRoll, 'f', 1));
+    yawRateRightLbl->setText(QString::number(data[YAW]-prevYaw, 'f', 1));
 
     if (data[ALTITUDE] > 0)
         this->altitudeChart->update(data[ALTITUDE]);
     this->accelerationChart->update(data[ACC_Y]);
-
-
-/*
-        float* sensorData = this->serialInterface->getSensorData();
-        timeStamp = sensorData[TIMESTAMP];
-        packNum = this->serialInterface->getPackageNumber();
-        height = sensorData[ALTITUDE];
-        altGps = sensorData[ALTITUDE_GPS];
-        state = sensorData[STATE];
-        latitude = sensorData[LATITUDE_GPS];
-        longitude = sensorData[LONGITUDE_GPS];
-        temp = sensorData[BME_TEMP];
-        accY -= sensorData[ACC_Y];
-
-
-
-        QObject* object = (gpsMapView->rootObject())->findChild<QObject*>("gpsMapItem");
-        QVariant latitudeQV = QVariant(latitude);
-        QVariant longitudeQV = QVariant(longitude);
-        if (object != NULL) {
-            QMetaObject::invokeMethod(object, "updatePosition",
-                                      Q_ARG(QVariant, latitudeQV),
-                                      Q_ARG(QVariant, longitudeQV));
-        }
-    */
 }
 
+void MainWindow::updateStateVisual(globals::state state) {
+    switch (state) {
+        case globals::state::LANDED:
+            landedStateLight->turnOn();
+        case globals::state::CHUTE:
+            chuteStateLight->turnOn();
+        case globals::state::DROGUE:
+            drogueStateLight->turnOn();
+        case globals::state::APOGEE:
+            apogeeStateLight->turnOn();
+        case globals::state::AIRBRAKES:
+            airbrakesStateLight->turnOn();
+        case globals::state::BURNOUT:
+            burnoutStateLight->turnOn();
+        case globals::state::ARMED:
+            armedStateLight->turnOn();
+        default:
+            break;
+    }
+}
+
+void MainWindow::resetVisuals() {
+    altitudeChart->reset();
+    altitudeChart->setYAxisRange(0, globals::ALTITUDE_CHART_YRANGE);
+    accelerationChart->reset();
+    accelerationChart->setYAxisRange(
+                globals::ACCELERATION_CHAR_YRANGE_NEGATIVE,
+                globals::ACCELERATION_CHAR_YRANGE_POSITIVE
+                );
+    armedStateLight->turnOff();
+    burnoutStateLight->turnOff();
+    airbrakesStateLight->turnOff();
+    apogeeStateLight->turnOff();
+    drogueStateLight->turnOff();
+    chuteStateLight->turnOff();
+    landedStateLight->turnOff();
+
+    maxAltitude = 0;
+    maxAltiudeRightLbl->setText("0000");
+
+    altitudeRightLbl->setText("0000");
+    accelerationRightLbl->setText("000");
+    gpsMidLbl->setText("00");
+    gpsRightLbl->setText("00");
+    pitchRightLbl->setText("0000");
+    rollRightLbl->setText("0000");
+    yawRightLbl->setText("0000");
+    pitchRateRightLbl->setText("0000");
+    rollRateRightLbl->setText("0000");
+    yawRateRightLbl->setText("0000");
+
+}

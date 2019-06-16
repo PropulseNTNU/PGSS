@@ -23,6 +23,7 @@ public slots:
     void setYAxisTitle(QString title);
     void setColor(QColor color);
     void setWidth(int width);
+    void setYAxisRange(qint32 min, qint32 max);
 
     void update(double y);
     void reset();
@@ -39,7 +40,8 @@ private:
     int width;
     double x;
     double y;
-    int yRange;
+    int yRangePositive;
+    int yRangeNegative;
 };
 
 #endif // REALTIMECHART_H
