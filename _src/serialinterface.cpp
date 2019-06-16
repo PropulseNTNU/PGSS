@@ -5,6 +5,7 @@
 #include <QSerialPortInfo>
 #include <QDebug>
 #include <QDateTime>
+#include <iostream>
 
 
 SerialInterface::SerialInterface(QObject* parent) : QObject(parent),
@@ -53,30 +54,31 @@ bool SerialInterface::setupPort(QString portName, qint32 baudRate)
     }
 
     QSerialPortInfo portInfo(portName);
-    qDebug() << "Port information: ";
-    qDebug() << "Busy: " << portInfo.isBusy();
-    qDebug() << "Description: " << portInfo.description();
-    qDebug() << "Manufacturer: " << portInfo.manufacturer();
+    emit message("** Device information **");
+    emit message("- Busy: " + QString::number(portInfo.isBusy()));
+    emit message("- Description: " + portInfo.description());
+    emit message("- Manufacturer: " + portInfo.manufacturer());
 
     if (portInfo.isNull()) {
-        emit errorMessage("..No port named: " + portName);
+        emit message("..No port named: " + portName);
         return false;
     }
+
     QSerialPort* device = new QSerialPort(this);
     device->setPort(portInfo);
     if (!device->open(QSerialPort::ReadOnly)) {
-        emit errorMessage("..Failed to open device.");
-        emit errorMessage("Errorcode: " +
+        emit message("..Failed to open device.");
+        emit message("Errorcode: " +
                           QString::number(device->error()));
         delete device;
         device = nullptr;
         return false;
     }
-    device->clear();
+
     // Configure (Use default values if not set)
     if (!device->setBaudRate(baudRate)) {
-        emit errorMessage("..Failed to set baud rate of device.");
-        emit errorMessage("Errorcode: " +
+        emit message("..Failed to set baud rate of device.");
+        emit message("Errorcode: " +
                           QString::number(device->error()));
         device->clear();
         device->close();
@@ -86,8 +88,8 @@ bool SerialInterface::setupPort(QString portName, qint32 baudRate)
     }
 
     if (!device->setDataBits(QSerialPort::Data8)) {
-        emit errorMessage("Failed to set data bits of port.");
-        emit errorMessage("Errorcode: " +
+        emit message("Failed to set data bits of port.");
+        emit message("Errorcode: " +
                           QString::number(device->error()));
         device->clear();
         device->close();
@@ -98,20 +100,13 @@ bool SerialInterface::setupPort(QString portName, qint32 baudRate)
 
     this->serialDevice = device;
     connect(serialDevice, &QSerialPort::readyRead, this, &SerialInterface::readSerial);
-    connect(serialDevice, &QSerialPort::aboutToClose, [] {
-       qDebug() << "About to close..";
-    });
-    connect(serialDevice, &QSerialPort::errorOccurred, [] {
-        qDebug() << "Error occured..";
-    });
     emit deviceChanged(portName);
     return true;
 }
 
 void SerialInterface::readSerial()
 {
-    qDebug() << "Read!";
-    QByteArray data = serialDevice->readAll(); 
+    QByteArray data = serialDevice->readAll();
     QTextStream stream(dataFile);
     stream << data;
     buffer += data;
@@ -119,8 +114,6 @@ void SerialInterface::readSerial()
         buffer.clear();
     read_buffer(buffer, (uint8_t*)sensorData,
                 (NUM_TYPES)*sizeof(float), &packageNumber);
-    serialDevice->clear();
-
 }
 
 bool SerialInterface::setBaudRate(qint32 baudRate)

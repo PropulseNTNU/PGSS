@@ -55,7 +55,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-
+    delete serialInterface;
+    delete timer;
 }
 
 void MainWindow::createCentralWidget()
@@ -111,6 +112,7 @@ void MainWindow::createStatusBar()
     chuteStateLbl->setObjectName("descriptionLabel");
     landedStateLbl = new QLabel("LANDED");
     landedStateLbl->setObjectName("descriptionLabel");
+
     armedStateLight = new LightWidget(QColor(Qt::green));
     burnoutStateLight = new LightWidget(QColor(Qt::green));
     airbrakesStateLight = new LightWidget(QColor(Qt::green));
@@ -306,7 +308,7 @@ void MainWindow::createGPSMap()
 void MainWindow::createControlWidget()
 {
     controlWidget = new ControlWidget;
-    connect(controlWidget, &ControlWidget::baudRateChanged, [this] (qint32 baudRate) {
+     connect(controlWidget, &ControlWidget::baudRateChanged, [this] (qint32 baudRate) {
                 this->serialInterface->setBaudRate(baudRate);
             });
     connect(controlWidget, &ControlWidget::filenameChanged, [this] (QString filename) {
@@ -315,8 +317,8 @@ void MainWindow::createControlWidget()
     connect(serialInterface, &SerialInterface::deviceChanged, [this] (QString deviceName) {
         this->controlWidget->setDeviceName(deviceName);
     });
-    connect(serialInterface, &SerialInterface::errorMessage, [this] (QString errorMessage) {
-       this->controlWidget->writeToOutput(errorMessage);
+    connect(serialInterface, &SerialInterface::message, [this] (QString message) {
+       this->controlWidget->writeToOutput(message);
     });
 }
 
@@ -338,11 +340,11 @@ void MainWindow::showAvailablePorts()
 }
 
 void MainWindow::updateRealTimeVisuals()
-{   /*
+{
     if (!currentPort.size())
         return;
     float* data = this->serialInterface->getSensorData();
-    //qDebug() << data[ALTITUDE];
+
     altitudeRightLbl->setText(QString::number(data[ALTITUDE]));
     if (data[ALTITUDE] > maxAltitude) {
         maxAltitude = data[ALTITUDE];
@@ -363,7 +365,7 @@ void MainWindow::updateRealTimeVisuals()
 
     if (data[ALTITUDE] > 0)
         this->altitudeChart->update(data[ALTITUDE]);
-    this->accelerationChart->update(data[ACC_Y]); */
+    this->accelerationChart->update(data[ACC_Y]);
 
 
 /*

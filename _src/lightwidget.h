@@ -88,7 +88,7 @@ protected:
         painter.setRenderHint(QPainter::Antialiasing);
         painter.setBrush(m_color);
         painter.drawEllipse(0, 0, width(), height());
-        update();
+        //update();
     }
 
 private:

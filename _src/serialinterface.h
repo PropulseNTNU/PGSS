@@ -28,7 +28,7 @@ public slots:
     void readSerial(); // Called when device sends readyRead
 signals:
       void deviceChanged(QString deviceName);
-      void errorMessage(QString message);
+      void message(QString message);
 
 private:
     QSerialPort* serialDevice; // Current serial port device
