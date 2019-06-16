@@ -315,7 +315,9 @@ void MainWindow::createControlWidget()
     connect(serialInterface, &SerialInterface::deviceChanged, [this] (QString deviceName) {
         this->controlWidget->setDeviceName(deviceName);
     });
-
+    connect(serialInterface, &SerialInterface::errorMessage, [this] (QString errorMessage) {
+       this->controlWidget->writeToOutput(errorMessage);
+    });
 }
 
 void MainWindow::showAvailablePorts()
@@ -329,7 +331,7 @@ void MainWindow::showAvailablePorts()
            if (serialInterface->setupPort(currentPort, globals::SERIAL_BAUD_RATE))
                controlWidget->writeToOutput("Device successfully set up.");
            else
-               controlWidget->writeToOutput("Could not set up device.");
+               controlWidget->writeToOutput("Device not connected.");
         });
     }
 }

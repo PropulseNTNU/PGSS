@@ -45,22 +45,33 @@ QStringList SerialInterface::getAvailableDevices()
 
 bool SerialInterface::setupPort(QString portName, qint32 baudRate)
 {
+    if (serialDevice) {
+        serialDevice->clear();
+        serialDevice->close();
+        delete serialDevice;
+        serialDevice = nullptr;
+    }
+
     QSerialPortInfo portInfo(portName);
     if (portInfo.isNull()) {
-        emit errorMessage("No port named: " + portName);
+        emit errorMessage("..No port named: " + portName);
         return false;
     }
-    QSerialPort* device = new QSerialPort(portName, this);
-    if (!device->open(QSerialPort::ReadOnly)) {
-        emit errorMessage("Failed to open device.");
+    QSerialPort* device = new QSerialPort(portName);
+    if (!device->open(QSerialPort::ReadWrite)) {
+        emit errorMessage("..Failed to open device.");
+        emit errorMessage("Errorcode: " +
+                          QString::number(device->error()));
         delete device;
         device = nullptr;
         return false;
     }
 
     // Configure (Use default values if not set)
-    if (device->setBaudRate(baudRate)) {
-        emit errorMessage("Failed to set baud rate of device.");
+    if (!device->setBaudRate(baudRate)) {
+        emit errorMessage("..Failed to set baud rate of device.");
+        emit errorMessage("Errorcode: " +
+                          QString::number(device->error()));
         device->clear();
         device->close();
         delete device;
@@ -70,27 +81,26 @@ bool SerialInterface::setupPort(QString portName, qint32 baudRate)
 
     if (!device->setDataBits(QSerialPort::Data8)) {
         emit errorMessage("Failed to set data bits of port.");
+        emit errorMessage("Errorcode: " +
+                          QString::number(device->error()));
         device->clear();
         device->close();
         delete device;
         device = nullptr;
         return false;
     }
-    if (serialDevice) {
-        serialDevice->clear();
-        serialDevice->close();
-        delete serialDevice;
-        serialDevice = nullptr;
-    }
-    qDebug() << device->error();
+
     serialDevice = device;
+    serialDevice->clear();
+    serialDevice->flush();
     emit deviceChanged(portName);
-    connect(device, &QSerialPort::readyRead, this, &SerialInterface::readSerial);
+    connect(serialDevice, &QSerialPort::readyRead, this, &SerialInterface::readSerial);
     return true;
 }
 
 void SerialInterface::readSerial()
 {
+    qDebug() << "Read!";
     QByteArray data = serialDevice->readAll(); 
     QTextStream stream(dataFile);
     stream << data;
