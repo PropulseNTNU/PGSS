@@ -13,6 +13,8 @@ QT       += widgets core gui charts serialport \
 TARGET = PGSS
 TEMPLATE = app
 
+CONFIG -= app_budle
+
 DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
