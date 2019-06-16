@@ -53,12 +53,18 @@ bool SerialInterface::setupPort(QString portName, qint32 baudRate)
     }
 
     QSerialPortInfo portInfo(portName);
+    qDebug() << "Port information: ";
+    qDebug() << "Busy: " << portInfo.isBusy();
+    qDebug() << "Description: " << portInfo.description();
+    qDebug() << "Manufacturer: " << portInfo.manufacturer();
+
     if (portInfo.isNull()) {
         emit errorMessage("..No port named: " + portName);
         return false;
     }
-    QSerialPort* device = new QSerialPort(portName);
-    if (!device->open(QSerialPort::ReadWrite)) {
+    QSerialPort* device = new QSerialPort(this);
+    device->setPort(portInfo);
+    if (!device->open(QSerialPort::ReadOnly)) {
         emit errorMessage("..Failed to open device.");
         emit errorMessage("Errorcode: " +
                           QString::number(device->error()));
@@ -66,7 +72,7 @@ bool SerialInterface::setupPort(QString portName, qint32 baudRate)
         device = nullptr;
         return false;
     }
-
+    device->clear();
     // Configure (Use default values if not set)
     if (!device->setBaudRate(baudRate)) {
         emit errorMessage("..Failed to set baud rate of device.");
@@ -90,11 +96,15 @@ bool SerialInterface::setupPort(QString portName, qint32 baudRate)
         return false;
     }
 
-    serialDevice = device;
-    serialDevice->clear();
-    serialDevice->flush();
-    emit deviceChanged(portName);
+    this->serialDevice = device;
     connect(serialDevice, &QSerialPort::readyRead, this, &SerialInterface::readSerial);
+    connect(serialDevice, &QSerialPort::aboutToClose, [] {
+       qDebug() << "About to close..";
+    });
+    connect(serialDevice, &QSerialPort::errorOccurred, [] {
+        qDebug() << "Error occured..";
+    });
+    emit deviceChanged(portName);
     return true;
 }
 

@@ -19,7 +19,7 @@ namespace globals {
     const int NAVBALL_HEIGHT = 200;
 
     const int SERIAL_BUFFER_SIZE = 1000;
-    const int SERIAL_BAUD_RATE = 115200;
+    const int SERIAL_BAUD_RATE = 9600;
 
     const int LIGHTWIDGET_MIN_SIZE = 20;
 

@@ -24,12 +24,13 @@ public:
     void setFilePath(QString filePath);
     uint16_t getPackageNumber();
 
+public slots:
+    void readSerial(); // Called when device sends readyRead
 signals:
       void deviceChanged(QString deviceName);
       void errorMessage(QString message);
 
 private:
-    void readSerial(); // Called when device sends readyRead
     QSerialPort* serialDevice; // Current serial port device
     qint32 baudRate;
     QMap<QString, qint32> deviceBaudRate; // Port name as key, baud rate as value

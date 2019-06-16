@@ -24,6 +24,7 @@ public slots:
     void writeToLog(QString message);
     void writeToOutput(QString message);
     void setDeviceName(QString deviceName);
+    qint32 getBaudRate();
 
 private:
     QFrame* spacerLine;

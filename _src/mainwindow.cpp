@@ -328,7 +328,8 @@ void MainWindow::showAvailablePorts()
         QAction* portAction = this->deviceMenu->addAction(port);
         connect(portAction, &QAction::triggered, [this, portAction] {
            currentPort = portAction->text();
-           if (serialInterface->setupPort(currentPort, globals::SERIAL_BAUD_RATE))
+           if (serialInterface->setupPort(currentPort,
+                                          this->controlWidget->getBaudRate()))
                controlWidget->writeToOutput("Device successfully set up.");
            else
                controlWidget->writeToOutput("Device not connected.");
@@ -337,7 +338,7 @@ void MainWindow::showAvailablePorts()
 }
 
 void MainWindow::updateRealTimeVisuals()
-{
+{   /*
     if (!currentPort.size())
         return;
     float* data = this->serialInterface->getSensorData();
@@ -362,7 +363,7 @@ void MainWindow::updateRealTimeVisuals()
 
     if (data[ALTITUDE] > 0)
         this->altitudeChart->update(data[ALTITUDE]);
-    this->accelerationChart->update(data[ACC_Y]);
+    this->accelerationChart->update(data[ACC_Y]); */
 
 
 /*

@@ -54,7 +54,7 @@ void ControlWidget::createLeftSide()
     leftSecondLineContainer = new QWidget;
     deviceLbl = new QLabel("Device:");
     deviceLbl->setObjectName("Device");
-    deviceNameLbl = new QLabel("XBee HP900");
+    deviceNameLbl = new QLabel("None");
     deviceNameLbl->setObjectName("None");
     QHBoxLayout* secondLineLayout = new QHBoxLayout;
     secondLineLayout->addWidget(deviceLbl);
@@ -127,4 +127,9 @@ void ControlWidget::writeToOutput(QString message)
 void ControlWidget::setDeviceName(QString deviceName)
 {
     deviceNameLbl->setText(deviceName);
+}
+
+qint32 ControlWidget::getBaudRate()
+{
+    return this->baudRateLEdit->text().toInt();
 }
