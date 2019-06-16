@@ -11,15 +11,17 @@
 SerialInterface::SerialInterface(QObject* parent) : QObject(parent),
     buffer(""),
     baudRate(globals::SERIAL_BAUD_RATE),
-    dataFilePath(globals::DEFAULT_DATA_PATH),
+    filename(globals::DEFAULT_DATA_PATH +
+             globals::DEFAULT_DATA_FILENAME),
     packageNumber(0)
 {
     sensorData = new float[NUM_TYPES] {};
     serialDevice = nullptr;
-    dataFile = new QFile(dataFilePath+"launch_data.txt");
+    dataFile = new QFile(filename);
     if (!dataFile->open(QIODevice::ReadWrite))
-        qDebug() << "Could not open:";
-        // WRITE TO LOG HERE
+        emit message("Could not open file: " +
+                     filename
+                     + " for writing.");
 }
 
 SerialInterface::~SerialInterface()
@@ -138,17 +140,21 @@ uint16_t SerialInterface::getPackageNumber()
     return packageNumber;
 }
 
-void SerialInterface::setFileName(QString filename)
+void SerialInterface::setFile(QString filename)
 {
     if (dataFile) {
         dataFile->close();
         delete dataFile;
+        dataFile = nullptr;
     }
-    dataFile = new QFile(dataFilePath+filename);
-    dataFile->open(QIODevice::ReadWrite);
-}
-
-void SerialInterface::setFilePath(QString filePath)
-{
-    dataFilePath = filePath;
+    dataFile = new QFile(filename);
+    if (!dataFile->open(QIODevice::ReadWrite)) {
+        emit message("Could not open file: " +
+                     filename
+                     + " for writing.");
+    } else {
+        emit message("Opened file: " +
+                     filename
+                     + " for writing.");
+    }
 }

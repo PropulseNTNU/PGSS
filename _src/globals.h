@@ -9,7 +9,7 @@ namespace globals {
     const int CHART_XRANGE = 10;
     const int CHART_WIN_MIN_WIDTH = 400;
     const int CHART_WIN_MIN_HEIGHT = 300;
-    const int CHART_YRANGE_STEPFACTOR = 50;
+    const int CHART_YRANGE_STEPFACTOR = 20;
 
     const int ALTITUDE_CHART_YRANGE = 1;
     const int ACCELERATION_CHAR_YRANGE_POSITIVE = 10;
@@ -34,7 +34,7 @@ namespace globals {
     const int STATUSBAR_LOGO_WIDTH = 380;
     const int STATUSBAR_LOGO_HEIGHT = 180;
 
-    const QString DEFAULT_DATA_PATH = "/Users/olebjorn/Desktop/";
+    const QString DEFAULT_DATA_PATH = "/Users/";
     const QString DEFAULT_DATA_FILENAME = "launch_data.txt";
 
     enum state {

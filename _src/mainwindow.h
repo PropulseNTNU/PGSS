@@ -71,6 +71,14 @@ private:
     LightWidget* chuteStateLight;
     LightWidget* landedStateLight;
     void updateStateVisual(globals::state state);
+    globals::state currentState;
+
+    void updateMissionTime();
+    QTimer* missionTimer;
+    unsigned int hours;
+    unsigned int min;
+    unsigned int secs;
+    unsigned int msecs;
 
     void createDataSection();
     QWidget* dataSectionContainer;
@@ -112,6 +120,7 @@ private:
     RealTimeChart* accelerationChart;
     QtCharts::QChartView* altitudeChartView;
     QtCharts::QChartView* accelerationChartView;
+    QTimer* chartTimer;
 
     void createMenuBar();
     QMenuBar* menuBar;
@@ -132,8 +141,7 @@ private:
 
     SerialInterface* serialInterface;
     QString currentPort;
-    QTimer* timer;
-    ControlWidget* test;
+    bool visualsPaused;
     double maxAltitude;
     double prevPitch;
     double prevRoll;

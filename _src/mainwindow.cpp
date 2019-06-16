@@ -24,29 +24,36 @@
 #include <QQuickItem>
 #include <QTextStream>
 #include <QGridLayout>
+#include <QVariant>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent), currentPort(""),
     maxAltitude(0), prevPitch(0), prevRoll(0),
-    prevYaw(0)
+    prevYaw(0), currentState(globals::state::IDLE),
+    hours(0), min(0), secs(0), msecs(0),
+    visualsPaused(true)
 {
     // Create a serial interface
     serialInterface = new SerialInterface(this);
 
     // Create widgets
     createChartViews();
-    createMenuBar();
     createGPSMap();
     createStatusBar();
     createDataSection();
     createControlWidget();
+    createMenuBar();
     createCentralWidget();
 
-    // Setup timer for updating real time plot
-    timer = new QTimer;
-    timer->setInterval(globals::TIMER_UPDATE);
-    timer->start();
-    connect(timer, &QTimer::timeout, this, &MainWindow::updateRealTimeVisuals);
+    // Set up timer for updating real time plot
+    chartTimer = new QTimer;
+    chartTimer->setInterval(globals::TIMER_UPDATE);
+    connect(chartTimer, &QTimer::timeout, this, &MainWindow::updateRealTimeVisuals);
+
+    // Set up timer for mission time label
+    missionTimer = new QTimer;
+    missionTimer->setInterval(100);
+    connect(missionTimer, &QTimer::timeout, this, &MainWindow::updateMissionTime);
 
     // Set central widget
     setCentralWidget(centralWidget);
@@ -55,7 +62,8 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete serialInterface;
-    delete timer;
+    delete chartTimer;
+    delete missionTimer;
 }
 
 void MainWindow::createCentralWidget()
@@ -299,15 +307,24 @@ void MainWindow::createMenuBar()
     settingsMenu->addSeparator();
     QAction* startUpdatingVisualsAction = settingsMenu->addAction(tr("&Start visuals"));
     connect(startUpdatingVisualsAction, &QAction::triggered, [this] {
-       this->timer->start();
+       visualsPaused = false;
+       this->chartTimer->start();
     });
     QAction* stopUpdatingVisualsAction = settingsMenu->addAction(tr("&Pause visuals"));
     connect(stopUpdatingVisualsAction, &QAction::triggered, [this] {
-       this->timer->stop();
+       this->chartTimer->stop();
+       visualsPaused = true;
     });
 
     viewMenu = menuBar->addMenu(tr("&View"));
-
+    QAction* showGPSMapAction = viewMenu->addAction("Show map");
+    QAction* hideGPSMapAction = viewMenu->addAction("Hide map");
+    connect(showGPSMapAction, &QAction::triggered, [this] {
+       this->gpsMapView->show();
+    });
+    connect(hideGPSMapAction, &QAction::triggered, [this] {
+       this->gpsMapView->hide();
+    });
 
     setMenuBar(menuBar);
 }
@@ -333,7 +350,7 @@ void MainWindow::createControlWidget()
                 this->serialInterface->setBaudRate(baudRate);
             });
     connect(controlWidget, &ControlWidget::filenameChanged, [this] (QString filename) {
-       this->serialInterface->setFileName(filename);
+       this->serialInterface->setFile(filename);
     });
     connect(serialInterface, &SerialInterface::deviceChanged, [this] (QString deviceName) {
         this->controlWidget->setDeviceName(deviceName);
@@ -385,33 +402,77 @@ void MainWindow::updateRealTimeVisuals()
     rollRateRightLbl->setText(QString::number(data[ROLL]-prevRoll, 'f', 1));
     yawRateRightLbl->setText(QString::number(data[YAW]-prevYaw, 'f', 1));
 
-    if (data[ALTITUDE] > 0)
-        this->altitudeChart->update(data[ALTITUDE]);
+
+    this->altitudeChart->update(data[ALTITUDE]);
     this->accelerationChart->update(data[ACC_Y]);
+
+    QObject* object = (gpsMapView->rootObject())->findChild<QObject*>("gpsMapItem");
+    QVariant latitudeQV = QVariant(data[LATITUDE_GPS]);
+    QVariant longitudeQV = QVariant(data[LONGITUDE_GPS]);
+    if (object != NULL) {
+        QMetaObject::invokeMethod(object, "updatePosition",
+                                  Q_ARG(QVariant, latitudeQV),
+                                  Q_ARG(QVariant, longitudeQV));
+    }
 }
 
 void MainWindow::updateStateVisual(globals::state state) {
+    if (state == currentState)
+        return;
+    currentState = state;
+
+    // Switch state lights
     switch (state) {
-        case globals::state::LANDED:
-            landedStateLight->turnOn();
-        case globals::state::CHUTE:
-            chuteStateLight->turnOn();
-        case globals::state::DROGUE:
-            drogueStateLight->turnOn();
-        case globals::state::APOGEE:
-            apogeeStateLight->turnOn();
-        case globals::state::AIRBRAKES:
-            airbrakesStateLight->turnOn();
-        case globals::state::BURNOUT:
-            burnoutStateLight->turnOn();
         case globals::state::ARMED:
             armedStateLight->turnOn();
+            controlWidget->writeToOutput(
+                                    QTime(hours, min, secs, msecs).toString("hh:mm:ss:zz")
+            + "  Rocket is armed.");
+            missionTimer->start();
+            break;
+        case globals::state::BURNOUT:
+            burnoutStateLight->turnOn();
+            controlWidget->writeToOutput(
+                                    QTime(hours, min, secs, msecs).toString("hh:mm:ss:zz")
+            + "  Entering motor burnout.");
+            break;
+        case globals::state::APOGEE:
+            apogeeStateLight->turnOn();
+            controlWidget->writeToOutput(
+                                QTime(hours, min, secs, msecs).toString("hh:mm:ss:zz")
+            + "  Apogee reached at " + QString::number(maxAltitude) + " meters.");
+            break;
+        case globals::state::AIRBRAKES:
+            airbrakesStateLight->turnOn();
+            controlWidget->writeToOutput(
+                                    QTime(hours, min, secs, msecs).toString("hh:mm:ss:zz")
+            + "  Entering airbrakes state.");
+            break;
+        case globals::state::DROGUE:
+            drogueStateLight->turnOn();
+            controlWidget->writeToOutput(
+                                    QTime(hours, min, secs, msecs).toString("hh:mm:ss:zz")
+            + "  Drogue deployed.");
+            break;
+        case globals::state::CHUTE:
+            chuteStateLight->turnOn();
+            controlWidget->writeToOutput(
+                                    QTime(hours, min, secs, msecs).toString("hh:mm:ss:zz")
+            + "  Main chute deployed.");
+            break;
+        case globals::state::LANDED:
+            landedStateLight->turnOn();
+            controlWidget->writeToOutput(
+                                    QTime(hours, min, secs, msecs).toString("hh:mm:ss:zz")
+            + "  The rocket has landed. View->Show map for location.");
+            missionTimer->stop();
         default:
             break;
     }
 }
 
 void MainWindow::resetVisuals() {
+    // Reset charts
     altitudeChart->reset();
     altitudeChart->setYAxisRange(0, globals::ALTITUDE_CHART_YRANGE);
     accelerationChart->reset();
@@ -419,6 +480,8 @@ void MainWindow::resetVisuals() {
                 globals::ACCELERATION_CHAR_YRANGE_NEGATIVE,
                 globals::ACCELERATION_CHAR_YRANGE_POSITIVE
                 );
+
+    // Reset state lights
     armedStateLight->turnOff();
     burnoutStateLight->turnOff();
     airbrakesStateLight->turnOff();
@@ -427,9 +490,12 @@ void MainWindow::resetVisuals() {
     chuteStateLight->turnOff();
     landedStateLight->turnOff();
 
+    // Reset timer
+    timeLbl->setText(QTime(0, 0, 0, 0).toString("hh:mm:ss:zz"));
+
+    // Reset data section
     maxAltitude = 0;
     maxAltiudeRightLbl->setText("0000");
-
     altitudeRightLbl->setText("0000");
     accelerationRightLbl->setText("000");
     gpsMidLbl->setText("00");
@@ -441,4 +507,22 @@ void MainWindow::resetVisuals() {
     rollRateRightLbl->setText("0000");
     yawRateRightLbl->setText("0000");
 
+}
+
+void MainWindow::updateMissionTime() {
+    msecs += 100;
+    if (msecs >= 1000) {
+        secs += 1;
+        msecs -= 1000;
+    }
+    if (secs >= 60) {
+        min += 1;
+        secs -= 60;
+    }
+    if (min >= 60) {
+        hours += 1;
+        min -= 60;
+    }
+    if (!visualsPaused)
+        timeLbl->setText(QTime(hours, min, secs, msecs).toString("hh:mm:ss:zz"));
 }

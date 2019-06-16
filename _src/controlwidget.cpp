@@ -9,11 +9,16 @@
 #include <QVBoxLayout>
 #include <QGridLayout>
 #include <QSizePolicy>
+#include <QFileDialog>
+#include <QFile>
+#include <QTextStream>
 
 ControlWidget::ControlWidget(QWidget *parent) : QWidget(parent),
     dataPath(globals::DEFAULT_DATA_PATH),
     dataFilename(globals::DEFAULT_DATA_FILENAME)
 {
+    logFile = new QFile(dataPath+"log_"+dataFilename);
+
     createLeftSide();
     createRightSide();
     outputList = new QListWidget;
@@ -32,6 +37,12 @@ ControlWidget::ControlWidget(QWidget *parent) : QWidget(parent),
     QVBoxLayout* centralLayout = new QVBoxLayout;
     centralLayout->addLayout(gridLayout);
     setLayout(centralLayout);
+}
+
+ControlWidget::~ControlWidget() {
+    if (logFile)
+        logFile->close();
+        delete logFile;
 }
 
 void ControlWidget::createLeftSide()
@@ -82,6 +93,18 @@ void ControlWidget::createRightSide()
     pathBtn = new QPushButton("Set");
     pathBtn->setObjectName("Set");
     connect(pathBtn, &QPushButton::clicked, [this] {
+        this->dataPath =  QFileDialog::getExistingDirectory(this, tr("Open Directory"),
+                                                      this->dataPath,
+                                                      QFileDialog::ShowDirsOnly
+                                                      | QFileDialog::DontResolveSymlinks) + "/";
+        if (this->logFile) {
+            this->logFile->close();
+            delete this->logFile;
+            this->logFile = nullptr;
+        }
+        this->logFile = new QFile(this->dataPath+"log_"+this->dataFilename);
+        this->logFile->open(QIODevice::ReadWrite);
+        this->pathLEdit->setText(this->dataPath);
         emit this->filenameChanged(this->dataPath+this->dataFilename);
     });
     QHBoxLayout* firstLineLayout = new QHBoxLayout;
@@ -98,6 +121,14 @@ void ControlWidget::createRightSide()
     filenameBtn = new QPushButton("Set");
     filenameBtn->setObjectName("Set");
     connect(filenameBtn, &QPushButton::clicked, [this] {
+        this->dataFilename = filenameLEdit->text();
+        if (this->logFile) {
+            this->logFile->close();
+            delete this->logFile;
+            this->logFile = nullptr;
+        }
+        this->logFile = new QFile(this->dataPath+"log_"+this->dataFilename);
+        this->logFile->open(QIODevice::ReadWrite);
         emit this->filenameChanged(this->dataPath+this->dataFilename);
     });
     QHBoxLayout* rightSecondLineContainerLayout = new QHBoxLayout;
@@ -114,13 +145,10 @@ void ControlWidget::createRightSide()
     rightSideBox->setLayout(rightSideBoxLayout);
 }
 
-void ControlWidget::writeToLog(QString message)
-{
-
-}
-
 void ControlWidget::writeToOutput(QString message)
 {
+    QTextStream stream(logFile);
+    stream << message << "\n";
     outputList->addItem(message);
 }
 

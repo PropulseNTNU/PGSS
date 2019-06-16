@@ -5,7 +5,7 @@ import QtPositioning 5.6
 
 Item {
     visible: true
-    width: 512
+    width: 650
     height: 700
     Plugin {
         id: mapPlugin
@@ -34,9 +34,9 @@ Item {
 
             sourceItem: Image {
                 id: markerImage
-                height: 35
-                width: 35
-                source: "qrc:/../_resources/rocket_marker.png"
+                height: 100
+                width: 100
+                source: "qrc:/../_resources/Sleipner_nobkg.png"
             }
            function updatePosition(latitude, longitude) {
                gpsMap.clearMapItems();

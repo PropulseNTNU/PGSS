@@ -20,8 +20,7 @@ public:
     bool setBaudRate(qint32 baudRate);
     qint32 getBaudRate();
     float* getSensorData();
-    void setFileName(QString filename);
-    void setFilePath(QString filePath);
+    void setFile(QString filename);
     uint16_t getPackageNumber();
 
 public slots:
@@ -40,7 +39,7 @@ private:
     uint16_t packageNumber; // Stores current package number
 
     QFile *dataFile; // File object for storing all incoming raw data
-    QString dataFilePath;
+    QString filename;
 
 };
 
