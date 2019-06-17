@@ -16,6 +16,7 @@ SerialInterface::SerialInterface(QObject* parent) : QObject(parent),
     sensorData = new float[NUM_TYPES] {};
     serialDevice = nullptr;
     dataFile = new QFile(dataFilePath+"launch_data.txt");
+    stringDataFile = new QFile(dataFilePath+"string_"+"launch_data.txt");
     if (!dataFile->open(QIODevice::ReadWrite))
         qDebug() << "Could not open:";
         // WRITE TO LOG HERE
@@ -100,7 +101,6 @@ bool SerialInterface::setupPort(QString portName, qint32 baudRate)
 
 void SerialInterface::readSerial()
 {
-    qDebug() << "Read!";
     QByteArray data = serialDevice->readAll(); 
     QTextStream stream(dataFile);
     stream << data;
@@ -141,8 +141,15 @@ void SerialInterface::setFileName(QString filename)
         dataFile->close();
         delete dataFile;
     }
+    if (stringDataFile) {
+        stringDataFile->close();
+        delete stringDataFile;
+    }
+
     dataFile = new QFile(dataFilePath+filename);
+    stringDataFile = new QFile(dataFilePath+"string_"+filename);
     dataFile->open(QIODevice::ReadWrite);
+    stringDataFile->open(QIODevice::ReadWrite);
 }
 
 void SerialInterface::setFilePath(QString filePath)
