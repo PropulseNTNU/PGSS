@@ -18,6 +18,7 @@ enum sensorData { TIMESTAMP, BME_TEMP, IMU_TEMP,
                   STATE, ALTITUDE_GPS, LONGITUDE_GPS, LATITUDE_GPS, NUM_TYPES
               };
 
+
 enum sensorDataBle { TIME, TROLL, TPITCH, TYAW,
                 TACCELERATION_X, TACCELERATION_Y, TACCELERATION_Z,
                 TCOMPASS_X, TCOMPASS_Y, TCOMPASS_Z ,
