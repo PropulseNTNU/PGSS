@@ -39,6 +39,7 @@ private:
     uint16_t packageNumber; // Stores current package number
 
     QFile *dataFile; // File object for storing all incoming raw data
+    QFile *stringFile;
     QString filename;
 
 };
