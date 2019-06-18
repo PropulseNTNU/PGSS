@@ -93,11 +93,14 @@ void ControlWidget::createRightSide()
     pathBtn = new QPushButton("Set");
     pathBtn->setObjectName("Set");
     connect(pathBtn, &QPushButton::clicked, [this] {
-        this->dataPath =  QFileDialog::getExistingDirectory(this, tr("Open Directory"),
+
+         QString newPath = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
                                                       this->dataPath,
                                                       QFileDialog::ShowDirsOnly
                                                       | QFileDialog::DontResolveSymlinks) + "/";
-        if (this->logFile) {
+         if (newPath != "/")
+            this->dataPath = newPath;
+         if (this->logFile) {
             this->logFile->close();
             delete this->logFile;
             this->logFile = nullptr;

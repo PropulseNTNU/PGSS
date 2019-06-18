@@ -10,7 +10,6 @@ namespace globals {
     const int CHART_WIN_MIN_WIDTH = 400;
     const int CHART_WIN_MIN_HEIGHT = 300;
     const int CHART_YRANGE_STEPFACTOR = 20;
-
     const int ALTITUDE_CHART_YRANGE = 1;
     const int ACCELERATION_CHAR_YRANGE_POSITIVE = 10;
     const int ACCELERATION_CHAR_YRANGE_NEGATIVE = -10;
@@ -24,7 +23,7 @@ namespace globals {
     const int NAVBALL_WIDTH = 200;
     const int NAVBALL_HEIGHT = 200;
 
-    const int SERIAL_BUFFER_SIZE = 1000;
+    const int SERIAL_BUFFER_SIZE = 1000; // Should be at least two times the package size
     const int SERIAL_BAUD_RATE = 115200;
 
     const int LIGHTWIDGET_MIN_SIZE = 20;

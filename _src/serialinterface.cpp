@@ -18,6 +18,8 @@ SerialInterface::SerialInterface(QObject* parent) : QObject(parent),
     sensorData = new float[NUM_TYPES+NUMBER_OF_SENSORS] {};
     serialDevice = nullptr;
     dataFile = new QFile(filename);
+    stringFile = new QFile(filename.split(".")[0]+"_string.txt");
+    stringFile->open(QIODevice::ReadWrite);
     if (!dataFile->open(QIODevice::ReadWrite))
         emit message("Could not open file: " +
                      filename
@@ -109,13 +111,18 @@ bool SerialInterface::setupPort(QString portName, qint32 baudRate)
 void SerialInterface::readSerial()
 {
     QByteArray data = serialDevice->readAll();
-    QTextStream stream(dataFile);
-    stream << data;
+    dataFile->write(data);
     buffer += data;
     if (buffer.size() > globals::SERIAL_BUFFER_SIZE)
         buffer.clear();
     read_buffer(buffer, (uint8_t*)sensorData,
                 (NUM_TYPES+NUMBER_OF_SENSORS)*sizeof(float), &packageNumber);
+
+    QTextStream stringStream(stringFile);
+    for (int i = 0; i < sensorData::NUM_TYPES+sensorDataBle::NUMBER_OF_SENSORS; i++) {
+        stringStream << QString::number(sensorData[i]) << ",";
+    }
+    stringStream << QString::number(packageNumber) << "\n";
 }
 
 bool SerialInterface::setBaudRate(qint32 baudRate)
@@ -147,7 +154,15 @@ void SerialInterface::setFile(QString filename)
         delete dataFile;
         dataFile = nullptr;
     }
+    if (stringFile) {
+        stringFile->close();
+        delete stringFile;
+        stringFile = nullptr;
+    }
+
     dataFile = new QFile(filename);
+    stringFile = new QFile(filename.split(".")[0]+"_string.txt");
+    stringFile->open(QIODevice::ReadWrite);
     if (!dataFile->open(QIODevice::ReadWrite)) {
         emit message("Could not open file: " +
                      filename
