@@ -18,7 +18,8 @@ SerialInterface::SerialInterface(QObject* parent) : QObject(parent),
     sensorData = new float[NUM_TYPES] {};
     serialDevice = nullptr;
     dataFile = new QFile(filename);
-    stringFile = new QFile(filename.split(".")[0]+"_.txt");
+    stringFile = new QFile(filename.split(".")[0]+"_string.txt");
+    stringFile->open(QIODevice::ReadWrite);
     if (!dataFile->open(QIODevice::ReadWrite))
         emit message("Could not open file: " +
                      filename
@@ -117,7 +118,6 @@ void SerialInterface::readSerial()
         buffer.clear();
     read_buffer(buffer, (uint8_t*)sensorData,
                 (NUM_TYPES)*sizeof(float), &packageNumber);
-
     QTextStream stringStream(stringFile);
     for (int i = 0; i < NUM_TYPES; i++) {
         stringStream << QString::number(sensorData[i]) << ",";
@@ -161,7 +161,7 @@ void SerialInterface::setFile(QString filename)
     }
 
     dataFile = new QFile(filename);
-    stringFile = new QFile(filename.split(".")[0]+"_.txt");
+    stringFile = new QFile(filename.split(".")[0]+"_string.txt");
     stringFile->open(QIODevice::ReadWrite);
     if (!dataFile->open(QIODevice::ReadWrite)) {
         emit message("Could not open file: " +

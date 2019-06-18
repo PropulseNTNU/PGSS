@@ -23,6 +23,7 @@ enum sensorDataBle { TIME, TROLL, TPITCH, TYAW,
                 TCOMPASS_X, TCOMPASS_Y, TCOMPASS_Z ,
                 TEMPERATURES , THUMIDITY, TALTITUDE, TPRESSURE, TGAS, TEMP_ACCUR_SENS,
                 NUMBER_OF_SENSORS};
+
 /*
  * Read last data package from buffer to flags[], sensors[] and package_number.
  * Return index of package start byte '<' in buffer
