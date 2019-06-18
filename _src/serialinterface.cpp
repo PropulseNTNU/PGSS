@@ -15,7 +15,7 @@ SerialInterface::SerialInterface(QObject* parent) : QObject(parent),
              globals::DEFAULT_DATA_FILENAME),
     packageNumber(0)
 {
-    sensorData = new float[NUM_TYPES] {};
+    sensorData = new float[sensorData::NUM_TYPES] {};
     serialDevice = nullptr;
     dataFile = new QFile(filename);
     stringFile = new QFile(filename.split(".")[0]+"_string.txt");
@@ -111,15 +111,15 @@ bool SerialInterface::setupPort(QString portName, qint32 baudRate)
 void SerialInterface::readSerial()
 {
     QByteArray data = serialDevice->readAll();
-    QTextStream stream(dataFile);
-    stream << data;
+    dataFile->write(data);
     buffer += data;
     if (buffer.size() > globals::SERIAL_BUFFER_SIZE)
         buffer.clear();
     read_buffer(buffer, (uint8_t*)sensorData,
-                (NUM_TYPES)*sizeof(float), &packageNumber);
+                (sensorData::NUM_TYPES)*sizeof(float), &packageNumber);
+
     QTextStream stringStream(stringFile);
-    for (int i = 0; i < NUM_TYPES; i++) {
+    for (int i = 0; i < sensorData::NUM_TYPES; i++) {
         stringStream << QString::number(sensorData[i]) << ",";
     }
     stringStream << QString::number(packageNumber) << "\n";
