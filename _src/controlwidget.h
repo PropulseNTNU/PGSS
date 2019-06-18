@@ -8,23 +8,27 @@ class QPushButton;
 class QLabel;
 class QLineEdit;
 class QGroupBox;
+class QFrame;
+class QFile;
 
 class ControlWidget : public QWidget
 {
     Q_OBJECT
 public:
     explicit ControlWidget(QWidget *parent = nullptr);
-
+    ~ControlWidget();
 signals:
     void baudRateChanged(unsigned int baudRate);
     void filenameChanged(QString filename);
 
 public slots:
-    void writeToLog(QString message);
     void writeToOutput(QString message);
     void setDeviceName(QString deviceName);
+    qint32 getBaudRate();
 
 private:
+    QFrame* spacerLine;
+
     /* Left */
     //  First line
     QWidget* leftFirstLineContainer;
@@ -64,6 +68,7 @@ private:
     // Utility
     QString dataPath;
     QString dataFilename;
+    QFile *logFile;
 };
 
 #endif // CONTROLWIDGET_H

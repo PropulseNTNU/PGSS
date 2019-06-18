@@ -8,7 +8,6 @@ uint8_t read_buffer(QByteArray &buffer,
 	uint8_t data;
 	int package_size = sizeof(*package_number) + sensors_size; 
 
-
     int i = buffer.size();
 	do {
         if (i - package_size <= 0) { return buffer.size(); }

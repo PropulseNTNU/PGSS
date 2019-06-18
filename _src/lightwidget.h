@@ -50,6 +50,7 @@
 **
 ****************************************************************************/
 
+#include "globals.h"
 #include <QtWidgets>
 
 class LightWidget : public QWidget
@@ -58,7 +59,9 @@ class LightWidget : public QWidget
     Q_PROPERTY(bool on READ isOn WRITE setOn)
 public:
     LightWidget(const QColor &color, QWidget *parent = 0)
-        : QWidget(parent), m_color(color), m_on(false) {}
+        : QWidget(parent), m_color(color), m_on(false) {
+        setMinimumSize(globals::LIGHTWIDGET_MIN_SIZE, globals::LIGHTWIDGET_MIN_SIZE);
+    }
 
     bool isOn() const
         { return m_on; }
@@ -78,11 +81,14 @@ protected:
     void paintEvent(QPaintEvent *) override
     {
         if (!m_on)
-            return;
+            m_color = QColor(Qt::gray);
+        else
+            m_color = QColor(Qt::green);
         QPainter painter(this);
         painter.setRenderHint(QPainter::Antialiasing);
         painter.setBrush(m_color);
         painter.drawEllipse(0, 0, width(), height());
+        //update();
     }
 
 private:
